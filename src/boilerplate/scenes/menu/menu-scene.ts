@@ -1,7 +1,6 @@
-import { CST } from "../CST"
+import { CST } from "../../CST"
 
 export class MenuScene extends Phaser.Scene {
-  private startKey: Phaser.Input.Keyboard.Key;
   private optionCount = 1; // Количество кнопок меню.
 
   constructor() {
@@ -12,7 +11,6 @@ export class MenuScene extends Phaser.Scene {
 
 
   init(): void {
-    this.initRegistry();
   }
 
   create(): void {
@@ -21,7 +19,6 @@ export class MenuScene extends Phaser.Scene {
     
     // Добавить лого.
     let txt = this.add.text(this.sys.game.renderer.width / 3.2, this.sys.game.renderer.height * 0.20, "[SPHERE]", {font: '84px Courier New', fill: '#ffffff'}).setDepth(1);
-
 
     // Создать кнопки.
     let playButton    = this.add.image(this.sys.game.renderer.width / 2, this.sys.game.renderer.height / 2, CST.IMAGE.PLAY).setDepth(1);
@@ -36,7 +33,7 @@ export class MenuScene extends Phaser.Scene {
     playButton.on("pointerover", () => {})
     playButton.on("pointerout", () => {})
     playButton.on("pointerup", () => {
-        // this.scene.start("");
+        this.scene.start("ChooseHeroScene");
     })
 
     optionsButton.setInteractive();
@@ -48,16 +45,6 @@ export class MenuScene extends Phaser.Scene {
   }
 
   update(): void {
-  }
-
-  /**
-   * Build-in global game data manager to exchange data between scenes.
-   * Here we initialize our variables with a key.
-   */
-  private initRegistry(): void {
-    this.registry.set("points", 0);
-    this.registry.set("lives", 3);
-    this.registry.set("level", 1);
   }
 
 }

@@ -38,10 +38,7 @@ export class BootScene extends Phaser.Scene {
     this.load.on(
       "complete",
       function() {
-        // this.animationHelperInstance = new AnimationHelper(
-        //   this,
-        //   this.cache.json.get("animationJSON")
-        // );
+
         this.progressBar.destroy();
         this.loadingBar.destroy();
       },

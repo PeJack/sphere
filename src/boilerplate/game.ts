@@ -1,6 +1,7 @@
 import "phaser";
 import { BootScene } from "./scenes/boot-scene";
-import { MenuScene } from "./scenes/menu-scene";
+import { MenuScene } from "./scenes/menu/menu-scene";
+import { ChooseHeroScene } from "./scenes/menu/choose-hero-scene";
 
 
 // main game configuration
@@ -10,7 +11,7 @@ const config: GameConfig = {
   height: 768,
   type: Phaser.AUTO,
   parent: "game",
-  scene: [BootScene, MenuScene],
+  scene: [BootScene, MenuScene, ChooseHeroScene],
   physics: {
     default: "arcade",
     arcade: {
