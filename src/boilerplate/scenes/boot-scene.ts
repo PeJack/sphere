@@ -1,5 +1,6 @@
 
 import { AnimationHelper } from "../helpers/animation-helper";
+import { CST } from "../CST";
 
 export class BootScene extends Phaser.Scene {
   private animationHelperInstance: AnimationHelper;
@@ -7,15 +8,14 @@ export class BootScene extends Phaser.Scene {
   private progressBar: Phaser.GameObjects.Graphics;
 
   constructor() {
-  console.log("sadas");
     super({
       key: "BootScene"
     });
   }
 
   preload(): void {
-    // set the background and create loading bar
-    this.cameras.main.setBackgroundColor(0x98d687);
+    // Установить бэкграунд и и создать loadingBar.
+    this.cameras.main.setBackgroundColor(0x000000);
     this.createLoadingbar();
 
     // pass value to change the loading bar fill
@@ -38,22 +38,18 @@ export class BootScene extends Phaser.Scene {
     this.load.on(
       "complete",
       function() {
-        this.animationHelperInstance = new AnimationHelper(
-          this,
-          this.cache.json.get("animationJSON")
-        );
+        // this.animationHelperInstance = new AnimationHelper(
+        //   this,
+        //   this.cache.json.get("animationJSON")
+        // );
         this.progressBar.destroy();
         this.loadingBar.destroy();
       },
       this
     );
 
-    // load out package
-    this.load.pack(
-      "preload",
-      "./src/games/space-invaders/assets/pack.json",
-      "preload"
-    );
+    this.loadImages();
+    this.loadAudio();
   }
 
   update(): void {
@@ -62,6 +58,7 @@ export class BootScene extends Phaser.Scene {
 
   private createLoadingbar(): void {
     this.loadingBar = this.add.graphics();
+    // this.loadingBar.fillStyle(0x5dae47, 1);
     this.loadingBar.fillStyle(0x5dae47, 1);
     this.loadingBar.fillRect(
       this.cameras.main.width / 4 - 2,
@@ -70,5 +67,24 @@ export class BootScene extends Phaser.Scene {
       20
     );
     this.progressBar = this.add.graphics();
+  }
+
+  private loadImages(): void {
+    this.load.setPath("./assets/image");
+
+    for (let prop in CST.IMAGE) {
+        console.log(CST.IMAGE[prop])
+        //@ts-ignore
+        this.load.image(CST.IMAGE[prop], CST.IMAGE[prop]);
+    }
+  }
+  
+  private loadAudio(): void {
+    this.load.setPath("./assets/audio");
+
+    for (let prop in CST.AUDIO) {
+        //@ts-ignore
+        this.load.audio(CST.AUDIO[prop], CST.AUDIO[prop]);
+    }
   }
 }

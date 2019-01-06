@@ -1,13 +1,13 @@
 import "phaser";
 import { BootScene } from "./scenes/boot-scene";
-import { MenuScene } from "../games/space-invaders/scenes/menu-scene";
+import { MenuScene } from "./scenes/menu-scene";
 
 
 // main game configuration
 const config: GameConfig = {
   title: "Sphere",
-  width: 800,
-  height: 600,
+  width: 1024,
+  height: 768,
   type: Phaser.AUTO,
   parent: "game",
   scene: [BootScene, MenuScene],
@@ -17,7 +17,8 @@ const config: GameConfig = {
       gravity: { y: 200 }
     }
   },
-  backgroundColor: "#f5cc69",
+  // backgroundColor: "#f5cc69",
+  backgroundColor: "#f000000",
   pixelArt: true,
 
 };
@@ -29,6 +30,5 @@ export class Game extends Phaser.Game {
 }
 
 window.onload = () => {
-  var game = new Game(config);
+  const game = new Game(config);
 };
-

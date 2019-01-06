@@ -1,13 +1,8 @@
-/**
- * @author       Digitsensitive <digit.sensitivee@gmail.com>
- * @copyright    2018 Digitsensitive
- * @description  Space Invaders: Menu Scene
- * @license      Digitsensitive
- */
+import { CST } from "../CST"
 
 export class MenuScene extends Phaser.Scene {
   private startKey: Phaser.Input.Keyboard.Key;
-  private bitmapTexts: Phaser.GameObjects.BitmapText[] = [];
+  private optionCount = 1; // Количество кнопок меню.
 
   constructor() {
     super({
@@ -15,42 +10,44 @@ export class MenuScene extends Phaser.Scene {
     });
   }
 
+
   init(): void {
-    this.startKey = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.S
-    );
-    this.startKey.isDown = false;
     this.initRegistry();
   }
 
   create(): void {
-    this.bitmapTexts.push(
-      this.add.bitmapText(
-        this.sys.canvas.width / 2 - 65,
-        this.sys.canvas.height / 2,
-        "font",
-        "PRESS S TO PLAY",
-        8
-      )
-    );
+    // Добавить фон.
+    this.add.image(0, 0, CST.IMAGE.TITLE).setOrigin(0).setDepth(0);
+    
+    // Добавить лого.
+    let txt = this.add.text(this.sys.game.renderer.width / 3.2, this.sys.game.renderer.height * 0.20, "[SPHERE]", {font: '84px Courier New', fill: '#ffffff'}).setDepth(1);
 
-    this.bitmapTexts.push(
-      this.add.bitmapText(
-        this.sys.canvas.width / 2 - 60,
-        this.sys.canvas.height / 2 - 40,
-        "font",
-        "SPACE INVADERS",
-        8
-      )
-    );
+
+    // Создать кнопки.
+    let playButton    = this.add.image(this.sys.game.renderer.width / 2, this.sys.game.renderer.height / 2, CST.IMAGE.PLAY).setDepth(1);
+    let optionsButton = this.add.image(this.sys.game.renderer.width / 2, this.sys.game.renderer.height / 2 + 100, CST.IMAGE.OPTIONS).setDepth(1);
+
+
+    // Создать аудио.
+    this.sound.pauseOnBlur = false; // Делает воспроизвидение непрекращающимся при переходе на другую вкладку.
+    this.sound.play(CST.AUDIO.TITLE, {loop: true})
+
+    playButton.setInteractive();
+    playButton.on("pointerover", () => {})
+    playButton.on("pointerout", () => {})
+    playButton.on("pointerup", () => {
+        // this.scene.start("");
+    })
+
+    optionsButton.setInteractive();
+    optionsButton.on("pointerover", () => {})
+    optionsButton.on("pointerout", () => {})
+    optionsButton.on("pointerup", () => {
+        //this.scene.launch();
+    })
   }
 
   update(): void {
-    if (this.startKey.isDown) {
-      this.scene.start("HUDScene");
-      this.scene.start("GameScene");
-      this.scene.bringToTop("HUDScene");
-    }
   }
 
   /**
@@ -62,4 +59,5 @@ export class MenuScene extends Phaser.Scene {
     this.registry.set("lives", 3);
     this.registry.set("level", 1);
   }
+
 }
