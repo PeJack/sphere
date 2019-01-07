@@ -1,14 +1,18 @@
 import { CST } from "../../CST"
 
 export class ChooseHeroScene extends Phaser.Scene {
-  private chosenHero = "Mage"
-  mage: Phaser.GameObjects.Sprite;
-  swordman: Phaser.GameObjects.Sprite;
+  private sChosenHero     : string;
+  private oMage           : Phaser.GameObjects.Sprite;
+  private oSwordman       : Phaser.GameObjects.Sprite;
+  private oMageButton     : Phaser.GameObjects.Text;
+  private oSwordmanButton : Phaser.GameObjects.Text;
+  private oNextButton     : Phaser.GameObjects.Text;
 
   constructor() {
     super({
       key: "ChooseHeroScene"
     });
+    this.sChosenHero = "Mage";
   }
 
 
@@ -18,50 +22,49 @@ export class ChooseHeroScene extends Phaser.Scene {
 
   create(): void {
     // Добавить фон.
-    // this.cameras.main.setBackgroundColor(0x000000);
     this.add.image(0, 0, CST.IMAGE.TITLE).setOrigin(0).setDepth(0);
     
     // Добавить лого.
-    let txt = this.add.text(this.sys.game.renderer.width / 3.2, this.sys.game.renderer.height * 0.20, "[SPHERE]", {font: '84px Courier New', fill: '#ffffff'}).setDepth(1);
+    this.add.text(this.sys.game.renderer.width / 3.2, this.sys.game.renderer.height * 0.20, "[SPHERE]", {font: '84px Courier New', fill: '#ffffff'}).setDepth(1);
 
     // Создать кнопки.
-    let mageButton = this.add.text(100, this.sys.game.renderer.height / 2, "Mage", 
+    this.oMageButton = this.add.text(100, this.sys.game.renderer.height / 2, "Mage", 
       {
           font: '54px Courier New', 
           fill: '#ffffff'
       }).setDepth(1);
     
-    let swordmanButton = this.add.text(100, this.sys.game.renderer.height / 2 + 100, "Swordman",
+    this.oSwordmanButton = this.add.text(100, this.sys.game.renderer.height / 2 + 100, "Swordman",
       {
           font: '54px Courier New', 
           fill: '#ffffff'
       }).setDepth(1);
 
-    let nextButton = this.add.text(this.sys.game.renderer.width / 1.2, this.sys.game.renderer.height / 2 + 250, "Next",
+    this.oNextButton = this.add.text(this.sys.game.renderer.width / 1.2, this.sys.game.renderer.height / 2 + 250, "Next",
       {
           font: '54px Courier New', 
           fill: '#ffffff'
       }).setDepth(1);
 
     // Повесить условия на кнопки.
-    mageButton.setInteractive();
-    mageButton.on("pointerover", () => {})
-    mageButton.on("pointerout", () => {})
-    mageButton.on("pointerup", () => {
+    this.oMageButton.setInteractive();
+    this.oMageButton.on("pointerover", () => {})
+    this.oMageButton.on("pointerout", () => {})
+    this.oMageButton.on("pointerup", () => {
       this.chooseHero('mage');
     })
 
-    swordmanButton.setInteractive();
-    swordmanButton.on("pointerover", () => {})
-    swordmanButton.on("pointerout", () => {})
-    swordmanButton.on("pointerup", () => {
+    this.oSwordmanButton.setInteractive();
+    this.oSwordmanButton.on("pointerover", () => {})
+    this.oSwordmanButton.on("pointerout", () => {})
+    this.oSwordmanButton.on("pointerup", () => {
       this.chooseHero('swordman');
     })
 
-    nextButton.setInteractive();
-    nextButton.on("pointerover", () => {})
-    nextButton.on("pointerout", () => {})
-    nextButton.on("pointerup", () => {
+    this.oNextButton.setInteractive();
+    this.oNextButton.on("pointerover", () => {})
+    this.oNextButton.on("pointerout", () => {})
+    this.oNextButton.on("pointerup", () => {
         // this.scene.start("");
     })
 
@@ -83,15 +86,15 @@ export class ChooseHeroScene extends Phaser.Scene {
   }
 
   private chooseHero(type): void {
-    this.chosenHero = type;
+    this.sChosenHero = type;
     if (type == 'mage') {
-      if (this.swordman) {
-        this.swordman.destroy();
+      if (this.oSwordman) {
+        this.oSwordman.destroy();
       }
-      this.mage = this.add.sprite(this.sys.game.renderer.width / 1.4, this.sys.game.renderer.height / 2.4, CST.IMAGE.MAGE).setOrigin(0).setDepth(0);
+      this.oMage = this.add.sprite(this.sys.game.renderer.width / 1.4, this.sys.game.renderer.height / 2.4, CST.IMAGE.MAGE).setOrigin(0).setDepth(0);
     } else {
-      this.mage.destroy();
-      this.swordman = this.add.sprite(this.sys.game.renderer.width / 1.4, this.sys.game.renderer.height / 2.4, CST.IMAGE.SWORDMAN).setOrigin(0).setDepth(0).setDisplaySize(200,300);
+      this.oMage.destroy();
+      this.oSwordman = this.add.sprite(this.sys.game.renderer.width / 1.4, this.sys.game.renderer.height / 2.4, CST.IMAGE.SWORDMAN).setOrigin(0).setDepth(0).setDisplaySize(200,300);
     }
   }
 
