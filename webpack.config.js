@@ -3,15 +3,36 @@ var pathToPhaser = path.join(__dirname, '/node_modules/phaser/');
 var phaser = path.join(pathToPhaser, 'dist/phaser.js');
 
 module.exports = {
-  entry: './src/boilerplate/game.ts',
+  entry: './src/game.ts',
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'bundle.js',
   },
+  mode: 'development',
   module: {
     rules: [
       { test: /\.ts$/, loader: 'ts-loader', exclude: '/node_modules/' },
-      { test: /phaser\.js$/, loader: 'expose-loader?Phaser' }
+      { test: /phaser\.js$/, loader: 'expose-loader?Phaser' },
+      { 
+        test: /\.less$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'less-loader'
+          }
+        ]
+      },
+      {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [{
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]',
+            outputPath: 'fonts/'
+          }
+        }]
+      }
     ]
   },
   devServer: {

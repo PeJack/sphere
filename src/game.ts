@@ -1,4 +1,7 @@
 import "phaser";
+import "../styles/less/styles.less";
+// import "../styles/less/styles-fullscreen.less";
+
 import { BootScene } from "./scenes/boot-scene";
 import { MenuScene } from "./scenes/menu/menu-scene";
 import { ChooseHeroScene } from "./scenes/menu/choose-hero-scene";
