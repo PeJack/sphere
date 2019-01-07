@@ -12,6 +12,9 @@ export class GameScene extends Phaser.Scene {
     public nVisionRadius : number;
     public nTileSize : number;
 
+    
+    public oItemsMap : object;
+
     preload() : void {
         
     }
