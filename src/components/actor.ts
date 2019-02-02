@@ -23,7 +23,7 @@ export default class Actor {
     private nScale            : number;
     private bWalking          : boolean;
     private sCurrDir          : string;
-    private oPosition         : { x : number, y : number };  
+    public  oPosition         : { x : number, y : number };  
     public  oSprite           : Phaser.GameObjects.Sprite;
     public  oSpriteAdd        : spriteAdd;
     public  oDirectionScale   : directionScale;
@@ -137,7 +137,7 @@ export default class Actor {
             checkingPath.y = this.getPosition().y;
         }
 
-        if (!this.oGameScene.oMapsManager.canGo(checkingPath)) {
+        if (!this.oGameScene.oMapsManager.isWalkable(checkingPath)) {
             if (typeof callback == "function") {
                 callback.call(handler);
             }
@@ -218,11 +218,11 @@ export default class Actor {
       };
 
       if (arrIndex) {
-        this.oGameScene.oActorsList.splice(arrIndex, 1);
+        this.oGameScene.aActorsList.splice(arrIndex, 1);
       } else {
-        for (arrIndex = 0; arrIndex < this.oGameScene.oActorsList.length; arrIndex++) {
-          if (this.oGameScene.oActorsList[arrIndex].nLocalID == this.nLocalID) {
-            this.oGameScene.oActorsList.splice(arrIndex, 1);
+        for (arrIndex = 0; arrIndex < this.oGameScene.aActorsList.length; arrIndex++) {
+          if (this.oGameScene.aActorsList[arrIndex].nLocalID == this.nLocalID) {
+            this.oGameScene.aActorsList.splice(arrIndex, 1);
           }
         }
       };

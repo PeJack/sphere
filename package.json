@@ -1,15 +1,11 @@
 {
   "name": "sphere",
   "version": "0.0.1",
-  "description": "Boilerplate, Tutorials, Cheat Sheets and more for Phaser 3 in Typescript",
+  "description": "Sphere",
   "keywords": [
-    "Phaser",
-    "Phaser 3",
     "Phaser3",
     "TypeScript",
-    "Webpack",
-    "Tutorials",
-    "Game Examples"
+    "Webpack"
   ],
   "devDependencies": {
     "css-loader": "^2.1.0",
@@ -25,7 +21,8 @@
   },
   "dependencies": {
     "less": "^3.9.0",
-    "phaser": "3.10.1"
+    "phaser": "3.10.1",
+    "rot-js": "^2.0.3"
   },
   "scripts": {
     "dev": "webpack --mode development && webpack-dev-server --mode development",

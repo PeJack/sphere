@@ -2,7 +2,7 @@ import { GameScene } from '../scenes/game-scene';
 import Actor from './actor';
 import {ButtonHandler, buttons} from '../systems/buttonHandler';
 
-class Player extends Actor {
+export class Player extends Actor {
     public nSpriteOffset  : number;
     public nHp            : number;
     public nSp            : number;
