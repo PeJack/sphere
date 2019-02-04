@@ -1,14 +1,15 @@
 import RotMapCellular from 'rot-js/lib/map/cellular';
 import { GameScene } from '../scenes/game-scene';
 import { Map } from '../components/map';
+import { IPath } from '../interfaces';
 
-export class mapsManager {
+export class MapsManager {
     private oGameScene : GameScene;
     private nCols      : number;
     private nRows      : number;
     private nTilesize  : number;
     private oMapData   : RotMapCellular;
-    private oMap       : Map;
+    public oMap        : Map;
 
     constructor(gameScene: GameScene) {
         this.oGameScene = gameScene;
@@ -281,14 +282,14 @@ export class mapsManager {
         return _map;
     };
 
-    public isWalkable(dir: {x: number, y: number}) : boolean {
-        dir.x = Math.round(dir.x);
-        dir.y = Math.round(dir.y);
+    public isWalkable(path: IPath) : boolean {
+        path.x = Math.round(path.x);
+        path.y = Math.round(path.y);
 
-        return dir.x >= 0 &&
-            dir.x < this.nRows &&
-            dir.y >= 0 &&
-            dir.y < this.nCols &&
-            this.oMap.oTiles[dir.x][dir.y] === 0;
+        return path.x >= 0 &&
+            path.x < this.nRows &&
+            path.y >= 0 &&
+            path.y < this.nCols &&
+            this.oMap.oTiles[path.x][path.y] === 0;
     }
 }

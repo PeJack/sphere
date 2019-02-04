@@ -1,4 +1,4 @@
-import Helpers from '../Helpers';
+import Helpers from '../helpers';
 import { GameScene } from '../scenes/game-scene';
 import Actor from './actor';
 

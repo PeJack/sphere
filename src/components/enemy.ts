@@ -1,5 +1,6 @@
 import Actor from './actor';
 import { GameScene } from '../scenes/game-scene';
+import { IPath } from '../interfaces';
 
 
 export class Enemy extends Actor {
@@ -31,18 +32,18 @@ export class Enemy extends Actor {
         if (this.bAlerted) return;
 
         if (this.bVisibleForPlayer) {
-            if (this.oGameScene.oMapsManager.map.computeVisibilityBetween(this, this.oGameScene.oPlayer)) {
+            if (this.oGameScene.oMapsManager.oMap.computeVisibilityBetween(this, this.oGameScene.oPlayer)) {
                 this.bAlerted = true;
 
                 let aPath = [];
-                path = this.oGameScene.oItemsMapsManager.map.pathfinding(this, this.oGameScene.oPlayer);
-                path.shift();
-                this.moveTo(path);
+                aPath = this.oGameScene.oItemsMapsManager.oMap.pathfinding(this, this.oGameScene.oPlayer);
+                aPath.shift();
+                this.moveTo(aPath);
             }
         }
     }
 
-    moveTo(path) {
+    moveTo(path: IPath[]): void {
         let firstPath = path.shift();
         
         if (!firstPath) {
@@ -52,7 +53,7 @@ export class Enemy extends Actor {
         }
 
         if (this.oGameScene.oActorsMap.hasOwnProperty(firstPath.x + "." + firstPath.y)) {
-            path = this.oGameScene.oMapsManager.map.pathfinding(this, this.oGameScene.oPlayer);
+            path = this.oGameScene.oMapsManager.oMap.pathFinding(this, this.oGameScene.oPlayer);
             if (path.length > 1) path.shift();
             this.oGameScene.time.addEvent({
                 delay: 100,
@@ -65,7 +66,7 @@ export class Enemy extends Actor {
             return;
         }
 
-        if (this.oGameScene.oMapsManager.map.computeVisibilityBetween(this, this.oGameScene.oPlayer)) {
+        if (this.oGameScene.oMapsManager.oMap.computeVisibilityBetween(this, this.oGameScene.oPlayer)) {
             if (this.oAlertedTimer) { this.oAlertedTimer.destroy() };
             this.oAlertedTimer = this.oGameScene.time.addEvent({
                 delay: this.nAlertedTime * 1000,

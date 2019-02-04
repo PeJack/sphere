@@ -1,7 +1,10 @@
 import Inventory from "../components/inventory";
 import Actor from "../components/actor";
-import { mapsManager } from "../systems/mapsManager";
+import { MapsManager } from "../systems/mapsManager";
 import { Player } from "../components/player";
+import Item from "../components/item";
+import { IPosition, IGameObject, IPath } from "../interfaces";
+import { ButtonHandler } from "../systems/buttonHandler";
 
 interface layers {
     effects   : Phaser.GameObjects.Group,
@@ -10,16 +13,6 @@ interface layers {
     actors    : Phaser.GameObjects.Group,
     ground    : Phaser.Tilemaps.StaticTilemapLayer,
     decoration: Phaser.Tilemaps.StaticTilemapLayer
-}
-
-interface position {
-    x: number, y: number,
-    worldX: number, worldY: number
-}
-
-interface obj {
-    x: number, y: number,
-    worldX: number, worldY: number, off: number
 }
 
 export class GameScene extends Phaser.Scene {
@@ -33,21 +26,21 @@ export class GameScene extends Phaser.Scene {
     public aActorsList      : Actor[];
     public oActorsMap       : Map<string, Actor>;
 
-    public oMapsManager     : mapsManager;
+    public oMapsManager     : MapsManager;
     public oPlayer          : Player;
-
+    public oButtonHandler   : ButtonHandler;
 
     preload() : void {
     }
 
-    posToCoord(obj: obj) {
+    posToCoord(position: IPath) {
         return {
-          x: obj.x * this.nTileSize + this.nTileSize / 2,
-          y: obj.y * this.nTileSize + this.nTileSize / 2
+          x: position.x * this.nTileSize + this.nTileSize / 2,
+          y: position.y * this.nTileSize + this.nTileSize / 2
         }
     }
 
-    public getPosition(obj: obj): position {
+    public getPosition(obj: any): IPosition {
       return {
         x: Math.round((obj.x - this.nTileSize / 2) / this.nTileSize),
         y: Math.round((obj.y - this.nTileSize / 2 - (obj.off || 0)) / this.nTileSize),

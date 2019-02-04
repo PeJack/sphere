@@ -1,4 +1,5 @@
 import { GameScene } from '../scenes/game-scene';
+import { IPath } from '../interfaces';
 
 interface spriteAdd {
     off    : number,
@@ -32,6 +33,7 @@ export default class Actor {
     public  nLocalID          : number;
     public  bIsPlayer         : boolean; 
     public  bVisibleForPlayer : boolean;   
+    public  aPath             : IPath[];
 
     constructor(gameScene : GameScene, pos : {x : number, y : number}) {
         this.oGameScene = gameScene;
@@ -121,10 +123,10 @@ export default class Actor {
         return this.oGameScene.getPosition(this.oSprite);
     }
 
-    walkToTile(path?, direction?, callback?, handler?) : void {
+    walkToTile(path? : IPath, direction? : string, callback? : Function, context? : Class) : void {
         if (!path || (!path.x && !path.y)) {
             if (typeof callback == "function") {
-                callback.call(handler);
+                callback.call(context);
             }
 
             return;
@@ -139,7 +141,7 @@ export default class Actor {
 
         if (!this.oGameScene.oMapsManager.isWalkable(checkingPath)) {
             if (typeof callback == "function") {
-                callback.call(handler);
+                callback.call(context);
             }
 
             return;
@@ -147,7 +149,7 @@ export default class Actor {
 
         if (this.bIsPlayer && this.oGameScene.oActorsMap.hasOwnProperty(checkingPath.x + "." + checkingPath.y)) {
             if (typeof callback == "function") {
-              callback.call(handler);
+              callback.call(context);
             }
             
             return; 
@@ -176,7 +178,7 @@ export default class Actor {
                 this.startWalk(this.directionScale[direction]);
             },
             onComplete: function() {
-                this.stopWalk(callback, handler);
+                this.stopWalk(callback, context);
             }
         });
     }
