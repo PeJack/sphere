@@ -5,6 +5,13 @@ interface layers {
     actors    : Phaser.GameObjects.Group
 }
 
+export interface Position {
+  x       : number,
+  y       : number,
+  worldX  : number,
+  worldY  : number,
+}
+
 export class GameScene extends Phaser.Scene {
     public oLayers          : layers;
     public bRunning         : boolean;
@@ -21,7 +28,7 @@ export class GameScene extends Phaser.Scene {
     }
 
 
-    public getPosition(obj): object {
+    public getPosition(obj): Position {
       return {
         x: Math.round((obj.x - this.nTilesize / 2) / this.nTilesize),
         y: Math.round((obj.y - this.nTilesize / 2 - (obj.off || 0)) / this.nTilesize),

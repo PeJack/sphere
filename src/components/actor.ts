@@ -1,4 +1,4 @@
-import { GameScene } from '../scenes/game-scene';
+import { GameScene, Position } from '../scenes/game-scene';
 
 interface spriteAdd {
     off    : number,
@@ -15,13 +15,13 @@ interface directionScale {
 export default class Actor {
     private oGameScene      : GameScene;
     private oGroup          : Phaser.GameObjects.Group;
-    private nScale          : number;
     private bWalking        : boolean;
     private sCurrDir        : string;
     private bIsPlayer       : boolean;
     public  oSprite         : Phaser.GameObjects.Sprite;
     public  oSpriteAdd      : spriteAdd;
     public  oDirectionScale : directionScale;
+    public  nScale          : number;
     public  nSpriteOffset   : number;
 
     constructor(gameScene : GameScene, pos : {x : number, y : number}) {
@@ -101,5 +101,9 @@ export default class Actor {
 
     startIdle() : void {
         this.oSprite.anims.stop();
+    }
+
+    public getPosition(): Position{
+      return this.oGameScene.getPosition(this.oSprite);
     }
 }
