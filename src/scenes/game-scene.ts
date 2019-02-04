@@ -1,7 +1,7 @@
 import Inventory from "../components/inventory";
 import Actor from "../components/actor";
 import { mapsManager } from "../systems/mapsManager";
-import { player } from "../components/player";
+import { Player } from "../components/player";
 
 interface layers {
     effects   : Phaser.GameObjects.Group,
@@ -13,12 +13,13 @@ interface layers {
 }
 
 interface position {
-    x : number, y : number,
-    worldX : number, worldY : number
+    x: number, y: number,
+    worldX: number, worldY: number
 }
 
 interface obj {
-    x : number, y : number
+    x: number, y: number,
+    worldX: number, worldY: number, off: number
 }
 
 export class GameScene extends Phaser.Scene {
@@ -33,20 +34,20 @@ export class GameScene extends Phaser.Scene {
     public oActorsMap       : Map<string, Actor>;
 
     public oMapsManager     : mapsManager;
-    public oPlayer          : player;
+    public oPlayer          : Player;
 
 
     preload() : void {
     }
 
-    posToCoord(obj : obj) {
+    posToCoord(obj: obj) {
         return {
           x: obj.x * this.nTileSize + this.nTileSize / 2,
           y: obj.y * this.nTileSize + this.nTileSize / 2
         }
     }
 
-    public getPosition(obj): position {
+    public getPosition(obj: obj): position {
       return {
         x: Math.round((obj.x - this.nTileSize / 2) / this.nTileSize),
         y: Math.round((obj.y - this.nTileSize / 2 - (obj.off || 0)) / this.nTileSize),
