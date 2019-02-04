@@ -36,7 +36,7 @@ export class Enemy extends Actor {
                 this.bAlerted = true;
 
                 let aPath = [];
-                aPath = this.oGameScene.oItemsMapsManager.oMap.pathfinding(this, this.oGameScene.oPlayer);
+                aPath = this.oGameScene.oMapsManager.oMap.pathFinding(this, this.oGameScene.oPlayer);
                 aPath.shift();
                 this.moveTo(aPath);
             }

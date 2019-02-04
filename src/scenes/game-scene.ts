@@ -5,6 +5,7 @@ import { Player } from "../components/player";
 import Item from "../components/item";
 import { IPosition, IGameObject, IPath } from "../interfaces";
 import { ButtonHandler } from "../systems/buttonHandler";
+import { EffectsManager } from "../systems/effectsManager";
 
 interface layers {
     effects   : Phaser.GameObjects.Group,
@@ -29,6 +30,7 @@ export class GameScene extends Phaser.Scene {
     public oMapsManager     : MapsManager;
     public oPlayer          : Player;
     public oButtonHandler   : ButtonHandler;
+    public oEffectsManager  : EffectsManager;
 
     preload() : void {
     }

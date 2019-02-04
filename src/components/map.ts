@@ -5,6 +5,7 @@ import Astar from 'rot-js/lib/path/astar';
 import { GameScene } from '../scenes/game-scene';
 import PreciseShadowcasting from 'rot-js/lib/fov/precise-shadowcasting';
 import Actor from './actor';
+import { IPath } from '../interfaces';
 
 interface ITile extends Phaser.Tilemaps.Tile {
     isExplored?: boolean
@@ -144,7 +145,7 @@ export class Map {
         return visible;
     }
 
-    public pathFinding(actor1: Actor, actor2: Actor) : {x: number, y: number}[] {
+    public pathFinding(actor1: Actor, actor2: Actor) : IPath[] {
         const astar: Astar = new Astar(actor2.oPosition.x, actor2.oPosition.y, this.lightBlockCb);
         let path: {x: number, y: number}[] = [];
         

@@ -1,5 +1,5 @@
 import { GameScene } from '../scenes/game-scene';
-import { IPath } from '../interfaces';
+import { IPath, IPosition } from '../interfaces';
 
 interface spriteAdd {
     off    : number,
@@ -21,7 +21,7 @@ interface position {
 export default class Actor {
     public oGameScene         : GameScene;
     private oGroup            : Phaser.GameObjects.Group;
-    private nScale            : number;
+    public nScale             : number;
     private bWalking          : boolean;
     private sCurrDir          : string;
     public  oPosition         : { x : number, y : number };  
@@ -119,7 +119,7 @@ export default class Actor {
         this.oSprite.anims.stop();
     }
 
-    getPosition() : position {
+    getPosition() : IPosition {
         return this.oGameScene.getPosition(this.oSprite);
     }
 
