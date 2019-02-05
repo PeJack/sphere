@@ -1,4 +1,4 @@
-import { GameScene } from '../scenes/game-scene';
+import { GameScene } from '../scenes/gameScene';
 import Actor from './actor';
 import {ButtonHandler, IDownButtons} from '../systems/buttonHandler';
 

@@ -1,3 +1,4 @@
+
 import Inventory from "../components/inventory";
 import Actor from "../components/actor";
 import { MapsManager } from "../systems/mapsManager";
@@ -22,6 +23,8 @@ export class GameScene extends Phaser.Scene {
     public bPositionUpdated : boolean;
     public nVisionRadius    : number;
     public nTileSize        : number;
+
+    public aItemsList       : Item[];
     public oItemsMap        : Map<string, Item>;
     
     public aActorsList      : Actor[];
@@ -31,6 +34,12 @@ export class GameScene extends Phaser.Scene {
     public oPlayer          : Player;
     public oButtonHandler   : ButtonHandler;
     public oEffectsManager  : EffectsManager;
+
+    constructor() {
+      super({
+        key: "GameScene"
+      });
+    }
 
     preload() : void {
     }

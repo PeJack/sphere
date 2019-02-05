@@ -1,7 +1,7 @@
 import Actor from './actor';
 import Helpers from '../helpers';
 import VisualTimer from '../systems/VisualTimer';
-import { GameScene } from '../scenes/game-scene';
+import { GameScene } from '../scenes/gameScene';
 import { IPosition, IPath, IPoint, IItem } from '../interfaces';
 
 interface IRangeObject extends Phaser.GameObjects.Graphics {
@@ -9,24 +9,26 @@ interface IRangeObject extends Phaser.GameObjects.Graphics {
 }
 
 class Item extends Phaser.GameObjects.Sprite {
-    private oGameScene    : GameScene;
-    private oActor        : Actor;
-    private oGroup        : Phaser.GameObjects.Group;
-    private oRangeObject  : IRangeObject;
-    private oVisualTimer  : VisualTimer;
-    private bReloading    : boolean;
-    private sSpriteName   : string;
-    private sType         : string;
-    private sAttackType   : string;
-    private nId           : number;
-    private nStack        : number;
-    private nMaxStack     : number;
-    private nRange        : number;
-    private nReloadTime   : number;
-    private nDamage       : number;
-    private nLevel        : number;
-    private aData         : IItem;
-    private fEffect       : Function;   
+    private oGameScene      : GameScene;
+    private oActor          : Actor;
+    private oGroup          : Phaser.GameObjects.Group;
+    private oRangeObject    : IRangeObject;
+    private oVisualTimer    : VisualTimer;
+    private bReloading      : boolean;
+    private sSpriteName     : string;
+    private sType           : string;
+    private sAttackType     : string;
+    private nId             : number;
+    private nStack          : number;
+    private nMaxStack       : number;
+    private nRange          : number;
+    private nReloadTime     : number;
+    private nDamage         : number;
+    private nLevel          : number;
+    private aData           : IItem;
+    private fEffect         : Function;
+    
+    public oLastPos         : IPosition;        
     
     constructor(gameScene : GameScene, aData : IItem, pos : IPosition, actor : Actor) {
         super(gameScene, pos.x, pos.y, aData[3]); 

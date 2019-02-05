@@ -1,15 +1,15 @@
 import RotMapCellular from 'rot-js/lib/map/cellular';
-import { GameScene } from '../scenes/game-scene';
+import { GameScene } from '../scenes/gameScene';
 import { Map } from '../components/map';
 import { IPath } from '../interfaces';
 
 export class MapsManager {
-    private oGameScene : GameScene;
-    private nCols      : number;
-    private nRows      : number;
-    private nTilesize  : number;
-    private oMapData   : RotMapCellular;
-    public oMap        : Map;
+    private oGameScene  : GameScene;
+    private nTilesize   : number;
+    private oMapData    : RotMapCellular;
+    public oMap         : Map;
+    public nCols        : number;   
+    public nRows        : number;     
 
     constructor(gameScene: GameScene) {
         this.oGameScene = gameScene;

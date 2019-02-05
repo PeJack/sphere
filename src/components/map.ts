@@ -2,7 +2,7 @@ import RotFovPreciseShadowcasting from 'rot-js/lib/fov/precise-shadowcasting';
 import RotMapCellular from 'rot-js/lib/map/cellular';
 import Astar from 'rot-js/lib/path/astar';
 
-import { GameScene } from '../scenes/game-scene';
+import { GameScene } from '../scenes/gameScene';
 import PreciseShadowcasting from 'rot-js/lib/fov/precise-shadowcasting';
 import Actor from './actor';
 import { IPath } from '../interfaces';

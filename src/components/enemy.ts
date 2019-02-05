@@ -1,5 +1,5 @@
 import Actor from './actor';
-import { GameScene } from '../scenes/game-scene';
+import { GameScene } from '../scenes/gameScene';
 import { IPath } from '../interfaces';
 
 

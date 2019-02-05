@@ -1,4 +1,4 @@
-import { GameScene } from "../scenes/game-scene";
+import { GameScene } from "../scenes/gameScene";
 
 interface IButtons {
     UP:    Phaser.Input.Keyboard.Key,
