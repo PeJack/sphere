@@ -1,6 +1,6 @@
 import Actor from './actor';
 import { GameScene } from '../scenes/gameScene';
-import { IPath } from '../interfaces';
+import { IPath, IActorsListItem, IPosition } from '../interfaces';
 
 
 export class Enemy extends Actor {
@@ -13,7 +13,7 @@ export class Enemy extends Actor {
 
     public oAlertedTimer       : Phaser.Time.TimerEvent;
 
-    constructor(gameScene : GameScene, data : any[], pos : {x : number, y : number}) {
+    constructor(gameScene : GameScene, data : IActorsListItem, pos : IPosition) {
         super(gameScene, pos);
         
         this.nSpriteOffset = 0;
@@ -28,7 +28,7 @@ export class Enemy extends Actor {
         this.setAnimations();
     }
 
-    aiAct() : void {
+    public aiAct() : void {
         if (this.bAlerted) return;
 
         if (this.bVisibleForPlayer) {

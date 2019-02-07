@@ -1,6 +1,8 @@
 import { GameScene } from '../scenes/gameScene';
 import Actor from './actor';
 import {ButtonHandler, IDownButtons} from '../systems/buttonHandler';
+import { IActorsListItem, IPosition } from '../interfaces';
+import Item from './item';
 
 export class Player extends Actor {
     public nSpriteOffset  : number;
@@ -12,7 +14,7 @@ export class Player extends Actor {
     public oDownButtons   : IDownButtons;
     public bIsPlayer      : boolean;
 
-    constructor(gameScene : GameScene, data : any[], pos : {x : number, y : number}) {
+    constructor(gameScene : GameScene, data : IActorsListItem, pos : IPosition) {
         super(gameScene, pos);
 
         this.nSpriteOffset = 110;
@@ -25,8 +27,10 @@ export class Player extends Actor {
         this.oDownButtons   = this.oButtonHandler.oDownButtons;
 
         this.bIsPlayer     = true;
+
+        this.setAnimations() ;
     }
 
-    pickUp(item) : void {
+    pickUp(item: Item) : void {
     }
 }

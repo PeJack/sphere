@@ -9,6 +9,11 @@ export class ItemsManager {
     private aList       : IItem[];
     private aValidPos   : IPosition[];
 
+    constructor(gameScene: GameScene) {
+        this.oGameScene = gameScene;
+        this.aList = this.oGameScene.sys.game.cache.json.get("items").items;
+    }
+
     init(): void {
         this.aValidPos = [];
         for (let x = 0; x < this.oGameScene.oMapsManager.nCols; x++) {
@@ -20,7 +25,7 @@ export class ItemsManager {
         }
     }
     
-    create(id: number, actor: Actor, pos?: IPosition): Item {
+    create(id: number, pos?: IPosition, actor?: Actor): Item {
         let i: IItem, data: IItem, item: Item;
 
         i = this.aList.find((el)=> {
@@ -36,7 +41,7 @@ export class ItemsManager {
             if (!pos) {
                 while (this.aValidPos.length != this.oGameScene.aItemsList.length && !pos) {
                     _pos = this.aValidPos[Helpers.random(this.aValidPos.length)];
-                    if (!this.oGameScene.oItemsMap.has(_pos.x + "." + _pos.y)) {
+                    if (!this.oGameScene.oItemsMap.hasOwnProperty(_pos.x + "." + _pos.y)) {
                         pos = this.oGameScene.posToCoord(_pos);
                     }
                 }

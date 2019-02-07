@@ -14,8 +14,8 @@ export interface IGameObject {
 }
 
 export interface IPath {
-    x       : number;
-    y       : number;
+    x?      : number;
+    y?      : number;
     worldX? : number;
     worldY? : number;
 }
@@ -86,4 +86,11 @@ export interface IItem {
     5: number,
     18: number,
     37: number
+}
+
+export interface IActorsListItem {
+    id: number,
+    dmg?: number,
+    title?: string,
+    isPlayer: boolean
 }

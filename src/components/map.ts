@@ -12,13 +12,14 @@ interface ITile extends Phaser.Tilemaps.Tile {
 }
 
 export class Map {
-    private oGameScene : GameScene;
-    private oRotmap    : RotMapCellular;
-    private oTilemap   : Phaser.Tilemaps.Tilemap;
-    private nCols      : number;
-    private nRows      : number;
-    public oTiles      : number[][];
-    private oFov       : RotFovPreciseShadowcasting;
+    private oGameScene      : GameScene;
+    private oRotmap         : RotMapCellular;
+    private oTilemap        : Phaser.Tilemaps.Tilemap;
+    private nCols           : number;
+    private nRows           : number;
+    public oTiles           : number[][];
+    private oFov            : RotFovPreciseShadowcasting;
+    private lightBlockCb    : any;
 
     constructor(
         gameScene: GameScene, rotmap: RotMapCellular, 
@@ -31,16 +32,15 @@ export class Map {
         this.nRows = rows;
         this.nCols = cols;
         this.oTiles = JSON.parse(JSON.stringify(this.oRotmap._map));
-        let self = this;
-    }
 
-    lightBlockCb(x: number, y: number) : boolean {
-        x = Math.round(x);
-        y = Math.round(y);
-
-        return typeof this.oTiles[x] === 'undefined' ||
-            typeof this.oTiles[x][y] === 'undefined' ||
-            this.oTiles[x][y] === 0;        
+        const self = this;
+        this.lightBlockCb = function (x: number, y: number): boolean {
+            x = Math.round(x);
+            y = Math.round(y);
+            return typeof self.oTiles[x] === 'undefined' ||
+                    typeof self.oTiles[x][y] === 'undefined' ||
+                    self.oTiles[x][y] === 0;
+        }
     }
 
     exist(x: number, y: number) : string {
@@ -53,7 +53,7 @@ export class Map {
     light() : void {
         this.resetLight();
         this.oFov = new PreciseShadowcasting(this.lightBlockCb);
-
+        this.computeLight();
     }
 
     resetLight() : void {
@@ -91,7 +91,7 @@ export class Map {
                     }
                 });
 
-                if (this.oGameScene.oItemsMap.has(x + "." + y)) {
+                if (this.oGameScene.oItemsMap.hasOwnProperty(x + "." + y)) {
                     this.oGameScene.oItemsMap[x + "." + y].alpha = 0;
                 }
             }
@@ -126,7 +126,7 @@ export class Map {
                 }
             });
 
-            if (self.oGameScene.oItemsMap.has(x + "." + y)) {
+            if (self.oGameScene.oItemsMap.hasOwnProperty(x + "." + y)) {
                 self.oGameScene.oItemsMap[x + "." + y].alpha = visibility;
             };
         });

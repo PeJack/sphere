@@ -39,18 +39,19 @@ export class ButtonHandler {
 
     constructor(gameScene: GameScene) {
         this.oGameScene = gameScene;
-
-        this.oButtons.UP    = new Phaser.Input.Keyboard.Key(Phaser.Input.Keyboard.KeyCodes.UP); 
-        this.oButtons.DOWN  = new Phaser.Input.Keyboard.Key(Phaser.Input.Keyboard.KeyCodes.DOWN);
-        this.oButtons.LEFT  = new Phaser.Input.Keyboard.Key(Phaser.Input.Keyboard.KeyCodes.LEFT);
-        this.oButtons.RIGHT = new Phaser.Input.Keyboard.Key(Phaser.Input.Keyboard.KeyCodes.RIGHT); 
-        this.oButtons.ESC   = new Phaser.Input.Keyboard.Key(Phaser.Input.Keyboard.KeyCodes.ESC);
-        this.oButtons.I     = new Phaser.Input.Keyboard.Key(Phaser.Input.Keyboard.KeyCodes.I);
-        this.oButtons.W     = new Phaser.Input.Keyboard.Key(Phaser.Input.Keyboard.KeyCodes.W);
-        this.oButtons.A     = new Phaser.Input.Keyboard.Key(Phaser.Input.Keyboard.KeyCodes.A);
-        this.oButtons.S     = new Phaser.Input.Keyboard.Key(Phaser.Input.Keyboard.KeyCodes.S);
-        this.oButtons.D     = new Phaser.Input.Keyboard.Key(Phaser.Input.Keyboard.KeyCodes.D);
-        this.oButtons.E     = new Phaser.Input.Keyboard.Key(Phaser.Input.Keyboard.KeyCodes.E);
+        this.oButtons       = {} as IButtons;
+        
+        this.oButtons.UP    = this.oGameScene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP); 
+        this.oButtons.DOWN  = this.oGameScene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+        this.oButtons.LEFT  = this.oGameScene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        this.oButtons.RIGHT = this.oGameScene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT); 
+        this.oButtons.ESC   = this.oGameScene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+        this.oButtons.I     = this.oGameScene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
+        this.oButtons.W     = this.oGameScene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        this.oButtons.A     = this.oGameScene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        this.oButtons.S     = this.oGameScene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        this.oButtons.D     = this.oGameScene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        this.oButtons.E     = this.oGameScene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
         this.oPointer       = this.oGameScene.input.activePointer;  
         this.oGameScene.input.mouse.capture = true;

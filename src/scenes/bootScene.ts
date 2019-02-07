@@ -12,7 +12,7 @@ export class BootScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor(0x000000);
         this.createLoadingGraphics();
 
-        this.game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
+        this.sys.game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
 
         this.load.on(
             "progress",
@@ -39,7 +39,7 @@ export class BootScene extends Phaser.Scene {
         );
 
         this.load.image('forest-tiles', 'assets/sprites/foresttiles_0.png');
-        this.load.json('items', 'data/items.json');
+        this.load.json('items', 'assets/data/items.json');
         
         this.loadUI();
         this.loadItems();
@@ -65,7 +65,7 @@ export class BootScene extends Phaser.Scene {
         this.load.spritesheet("48bitSprites", "assets/sprites/48bitSprites.png", {frameHeight: 48, frameWidth: 48});
         this.load.spritesheet("timer", 'assets/ui/timer.png', {frameWidth: 66, frameHeight: 10});
         this.load.spritesheet("timer_bg", 'assets/ui/timer_bg.png', {frameWidth: 66, frameHeight: 10});
-        this.load.atlas("inventory", 'assets/ui/invent.png', 'assets/interface/invent.json');
+        this.load.atlas("inventory", 'assets/ui/invent.png', 'assets/ui/invent.json');
         this.load.image("ic_hand", "assets/ui/icons/ic_hand.png");
     }
 

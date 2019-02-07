@@ -1,41 +1,45 @@
 import { GameScene } from '../scenes/gameScene';
 import { IPath, IPosition } from '../interfaces';
+import Item from './item';
+import { ButtonHandler, IDownButtons } from '../systems/buttonHandler';
 
-interface spriteAdd {
+interface ISpriteAdd {
     off    : number,
     target : { x : number, y : number }
 }
 
-interface directionScale {
+interface IDirectionScale {
     up    : number,
     down  : number,
     left  : number,
     right : number
 }
 
-interface position {
-    x : number, y : number,
-    worldX : number, worldY : number
-}
-
 export default class Actor {
-    public oGameScene         : GameScene;
-    private oGroup            : Phaser.GameObjects.Group;
-    public nScale             : number;
-    private bWalking          : boolean;
-    private sCurrDir          : string;
-    public  oPosition         : { x : number, y : number };  
-    public  oSprite           : Phaser.GameObjects.Sprite;
-    public  oSpriteAdd        : spriteAdd;
-    public  oDirectionScale   : directionScale;
-    public  nSpriteOffset     : number;
-    public  nMovingDelay      : number;
-    public  nLocalID          : number;
-    public  bIsPlayer         : boolean; 
-    public  bVisibleForPlayer : boolean;   
-    public  aPath             : IPath[];
+    public oGameScene           : GameScene;
+    public nScale               : number;
+    public oPosition            : IPosition;  
+    public oSprite              : Phaser.GameObjects.Sprite;
+    public oSpriteAdd           : ISpriteAdd;
+    public oDirectionScale      : IDirectionScale;
+    public nSpriteOffset        : number;
+    public nMovingDelay         : number;
+    public nLocalID             : number;
+    public bIsPlayer            : boolean; 
+    public bVisibleForPlayer    : boolean;   
+    public aPath                : IPath[];
+    public oWeapon              : Item;
+    public nHp                  : number;
+    public nSp                  : number;
+    public nDamage              : number;
+    public oButtonHandler       : ButtonHandler;
+    public oDownButtons         : IDownButtons;
 
-    constructor(gameScene : GameScene, pos : {x : number, y : number}) {
+    private bWalking            : boolean;
+    private sCurrDir            : string; 
+    private oGroup              : Phaser.GameObjects.Group;       
+
+    constructor(gameScene: GameScene, pos: IPosition) {
         this.oGameScene = gameScene;
         this.oGroup = this.oGameScene.oLayers.actors;
         this.nScale = 0.4;
@@ -52,6 +56,8 @@ export default class Actor {
 
         this.oSprite.setOrigin(0.5, 0.5);
         this.oSprite.setScale(this.nScale, this.nScale);
+
+        this.oSpriteAdd = {} as ISpriteAdd;
         this.oSpriteAdd.off = -8;
         this.oSpriteAdd.target = {
             x: this.oSprite.x,
@@ -71,7 +77,7 @@ export default class Actor {
         };
     }
 
-    setAnimations() : void {
+    setAnimations(): void {
         this.oGameScene.anims.create({
             key: "idle",
             frames: this.oGameScene.anims.generateFrameNumbers(
@@ -115,15 +121,15 @@ export default class Actor {
         this.oSprite.play("idle", false, 2 + this.nSpriteOffset);
     }
 
-    startIdle() : void {
+    startIdle(): void {
         this.oSprite.anims.stop();
     }
 
-    getPosition() : IPosition {
+    getPosition(): IPosition {
         return this.oGameScene.getPosition(this.oSprite);
     }
 
-    walkToTile(path? : IPath, direction? : string, callback? : Function, context? : Class) : void {
+    walkToTile(path?: IPath, direction?: string, callback?: Function, context?: Class): void {
         if (!path || (!path.x && !path.y)) {
             if (typeof callback == "function") {
                 callback.call(context);
@@ -147,24 +153,24 @@ export default class Actor {
             return;
         }
 
-        if (this.bIsPlayer && this.oGameScene.oActorsMap.hasOwnProperty(checkingPath.x + "." + checkingPath.y)) {
-            if (typeof callback == "function") {
-              callback.call(context);
-            }
+        // if (this.bIsPlayer && this.oGameScene.oActorsMap.hasOwnProperty(checkingPath.x + "." + checkingPath.y)) {
+        //     if (typeof callback == "function") {
+        //         callback.call(context);
+        //     }
             
-            return; 
-        }
+        //     return; 
+        // }
     
         if (!this.bIsPlayer) {
-          this.oGameScene.oActorsMap[checkingPath.x + "." + checkingPath.y] = this;
+            this.oGameScene.oActorsMap[checkingPath.x + "." + checkingPath.y] = this;
         }
     
         let newCoords = this.oGameScene.posToCoord(path);
         if (newCoords.x) {
-          this.oSpriteAdd.target.x = newCoords.x;
+            this.oSpriteAdd.target.x = newCoords.x;
         }
         if (newCoords.y) {
-          this.oSpriteAdd.target.y = newCoords.y;
+            this.oSpriteAdd.target.y = newCoords.y;
         }
     
         this.sCurrDir = direction;
@@ -175,60 +181,82 @@ export default class Actor {
             duration: this.nMovingDelay,
             ease: 'Power2',
             onStart: function() {
-                this.startWalk(this.directionScale[direction]);
+                this.startWalk(this.oDirectionScale[direction]);
             },
+            onStartScope: this,
             onComplete: function() {
                 this.stopWalk(callback, context);
-            }
+            },
+            onCompleteScope: this
         });
     }
 
-    startWalk(direction : number) : void {
+    startWalk(direction: number): void {
         if (this.bWalking == false) {
-          this.bWalking = true;
+            this.bWalking = true;
         }
     
         let target = this.oSpriteAdd.target;
       
         if (direction) {
-          this.oSprite.scaleX = direction;
-          this.oSprite.play("walk");
-        } else {
-          if (target.y < this.oSprite.y) {
-            this.oSprite.play("walkup");
-          } else {
+            this.oSprite.scaleX = direction;
             this.oSprite.play("walk");
-          }
+        } else {
+            if (target.y < this.oSprite.y) {
+                this.oSprite.play("walkup");
+            } else {
+                this.oSprite.play("walk");
+            }
         }
     
         if (!this.bIsPlayer){
-          delete this.oGameScene.oActorsMap[this.oPosition.x + "." + this.oPosition.y];
+            delete this.oGameScene.oActorsMap[this.oPosition.x + "." + this.oPosition.y];
+        }
+    }
+
+    stopWalk(callback: Function, context: Class): void {
+        this.bWalking = false;
+        this.startIdle();
+
+        this.oPosition = {
+            x: this.getPosition().x,
+            y: this.getPosition().y
+        };
+
+        this.oGameScene.bPositionUpdated = true;
+
+        if (callback) {
+            callback.call(context);
         }
     }
 
     hurt(arrIndex? : number) : void {
-      if (!this.bIsPlayer) {
-        if (this.oGameScene.oActorsMap.hasOwnProperty(this.oPosition.x + "." + this.oPosition.y)) {
-          delete this.oGameScene.oActorsMap[this.oPosition.x + "." + this.oPosition.y];
-        } else {
-          for (let key in this.oGameScene.oActorsMap) {
-            if (this.oGameScene.oActorsMap[key].nLocalID == this.nLocalID) {
-              delete this.oGameScene.oActorsMap[key];
+        if (!this.bIsPlayer) {
+            if (this.oGameScene.oActorsMap.hasOwnProperty(this.oPosition.x + "." + this.oPosition.y)) {
+                delete this.oGameScene.oActorsMap[this.oPosition.x + "." + this.oPosition.y];
+            } else {
+                for (let key in this.oGameScene.oActorsMap) {
+                    if (this.oGameScene.oActorsMap[key].nLocalID == this.nLocalID) {
+                        delete this.oGameScene.oActorsMap[key];
+                    }
+                }
             }
-          }
-        }
-      };
+        };
 
-      if (arrIndex) {
-        this.oGameScene.aActorsList.splice(arrIndex, 1);
-      } else {
-        for (arrIndex = 0; arrIndex < this.oGameScene.aActorsList.length; arrIndex++) {
-          if (this.oGameScene.aActorsList[arrIndex].nLocalID == this.nLocalID) {
+        if (arrIndex) {
             this.oGameScene.aActorsList.splice(arrIndex, 1);
-          }
-        }
-      };
+        } else {
+            for (arrIndex = 0; arrIndex < this.oGameScene.aActorsList.length; arrIndex++) {
+                if (this.oGameScene.aActorsList[arrIndex].nLocalID == this.nLocalID) {
+                    this.oGameScene.aActorsList.splice(arrIndex, 1);
+                }
+            }
+        };
 
-      this.oSprite.destroy();
-    }  
+        this.oSprite.destroy();
+    }
+
+    pickUp(item: Item): void {}
+
+    aiAct(): void {}
 }

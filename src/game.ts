@@ -1,3 +1,5 @@
+import "phaser";
+
 import { BootScene } from "./scenes/bootScene";
 import { GameScene } from "./scenes/gameScene";
 
@@ -9,12 +11,6 @@ const config: GameConfig = {
   type: Phaser.AUTO,
   parent: "game",
   scene: [BootScene, GameScene],
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 200 }
-    }
-  },
   backgroundColor: "#f000000",
   pixelArt: true,
 

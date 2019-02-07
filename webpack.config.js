@@ -1,6 +1,7 @@
 var path = require('path');
 var pathToPhaser = path.join(__dirname, '/node_modules/phaser/');
 var phaser = path.join(pathToPhaser, 'dist/phaser.js');
+var assets = path.join(__dirname, '/assets/');
 
 module.exports = {
   entry: './src/game.ts',
@@ -45,7 +46,8 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     alias: {
-      phaser: phaser
+      phaser: phaser,
+      assets: assets
     }
   }
 };

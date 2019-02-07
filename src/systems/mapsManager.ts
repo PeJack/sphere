@@ -18,20 +18,30 @@ export class MapsManager {
         this.nRows = 50;
         this.nTilesize = this.oGameScene.nTileSize;
 
-        this.oMapData = this.generaeteMap('Map', this.oGameScene.cache, this.nRows, this.nCols, this.nTilesize, this.nTilesize);
+        this.oMapData = this.generateMap('Map', this.oGameScene.cache, this.nRows, this.nCols, this.nTilesize, this.nTilesize);
     } 
 
     public init(): void {
-        const map = this.oGameScene.make.tilemap({key: "Map"});
-        const mapTiles = map.addTilesetImage('forest-tiles', 'forest-tiles');
+        let opts = this.oGameScene.cache.tilemap.get("Map");
+        const map = this.oGameScene.make.tilemap({
+            key: "Map", 
+            data: this.oMapData._map,
+            tileHeight: opts.tileHeight,
+            tileWidth: opts.tileWidth
+        });
 
-        this.oGameScene.oLayers.ground = map.createStaticLayer("ground", mapTiles, 0, 0);
-        this.oGameScene.oLayers.decoration = map.createStaticLayer("decoration", mapTiles, 0, 0);
+        // map.layers = opts.layers;
+        map.orientation = opts.orientation;
+
+        const mapTiles = map.addTilesetImage('forest-tiles');
+
+        this.oGameScene.oLayers.ground = map.createStaticLayer(0, mapTiles, 0, 0);
+        // this.oGameScene.oLayers.decoration = map.createStaticLayer("decoration", mapTiles, 0, 0);
 
         this.oMap = new Map(this.oGameScene, this.oMapData, map, this.nCols, this.nRows);      
     }
 
-    private generaeteMap(keyName: string, 
+    private generateMap(keyName: string, 
         _cache: Phaser.Cache.CacheManager, 
         width: number, height: number, 
         tileWidth: number, tileHeight: number
@@ -85,8 +95,8 @@ export class MapsManager {
             ],
             tilewidth: tileWidth,
             version: 1,
-            height: tileHeight,
-            width: tileWidth
+            height: height,
+            width: width
         };
 
         const GROUND_TILE = 35;
