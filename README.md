@@ -6,7 +6,7 @@ Select a folder, navigate to it, and clone this repository
 with this command-line:
 
 ```
-git clone https://github.com/digitsensitive/phaser3-typescript.git
+git clone https://github.com/PeJack/sphere.git
 ```
 
 Install the dependencies with this command-line:

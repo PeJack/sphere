@@ -3,9 +3,10 @@ import { IPath, IPosition } from '../interfaces';
 import Item from './item';
 import { ButtonHandler, IDownButtons } from '../systems/buttonHandler';
 
-interface ISpriteAdd {
-    off    : number,
-    target : { x : number, y : number }
+//@ts-ignore
+interface ISpriteAdd extends Phaser.GameObjects.Sprite {
+    off?    : number,
+    target? : { x : number, y : number }
 }
 
 interface IDirectionScale {
@@ -19,8 +20,7 @@ export default class Actor {
     public oGameScene           : GameScene;
     public nScale               : number;
     public oPosition            : IPosition;  
-    public oSprite              : Phaser.GameObjects.Sprite;
-    public oSpriteAdd           : ISpriteAdd;
+    public oSprite              : ISpriteAdd;
     public oDirectionScale      : IDirectionScale;
     public nSpriteOffset        : number;
     public nMovingDelay         : number;
@@ -42,7 +42,7 @@ export default class Actor {
     constructor(gameScene: GameScene, pos: IPosition) {
         this.oGameScene = gameScene;
         this.oGroup = this.oGameScene.oLayers.actors;
-        this.nScale = 0.4;
+        this.nScale = 0.6;
         this.bWalking = false;
         this.sCurrDir = "down";
         this.bIsPlayer = false;
@@ -57,9 +57,8 @@ export default class Actor {
         this.oSprite.setOrigin(0.5, 0.5);
         this.oSprite.setScale(this.nScale, this.nScale);
 
-        this.oSpriteAdd = {} as ISpriteAdd;
-        this.oSpriteAdd.off = -8;
-        this.oSpriteAdd.target = {
+        this.oSprite.off = -8;
+        this.oSprite.target = {
             x: this.oSprite.x,
             y: this.oSprite.y
         };
@@ -84,8 +83,7 @@ export default class Actor {
                 "48bitSprites", {
                     // @ts-ignore
                     frames: [0 + this.nSpriteOffset, 1 + this.nSpriteOffset]
-                }),
-            repeat: -1
+                })
         });
 
         this.oGameScene.anims.create({
@@ -93,9 +91,10 @@ export default class Actor {
             frames: this.oGameScene.anims.generateFrameNumbers(
                 "48bitSprites", {
                     // @ts-ignore
-                    frames: [1 + this.nSpriteOffset, 2 + this.nSpriteOffset, 3 + this.nSpriteOffset, 2 + this.nSpriteOffset]
+                    frames: [1 + this.nSpriteOffset, 2 + this.nSpriteOffset, 3 + this.nSpriteOffset, 2 + this.nSpriteOffset],
                 }),
-            repeat: -1
+            repeat: -1,
+            frameRate: 8
         });
 
         this.oGameScene.anims.create({
@@ -105,7 +104,8 @@ export default class Actor {
                     // @ts-ignore
                     frames: [7 + this.nSpriteOffset, 8 + this.nSpriteOffset, 9 + this.nSpriteOffset, 8 + this.nSpriteOffset]
                 }),
-            repeat: -1
+            repeat: -1,
+            frameRate: 8
         });
 
         this.oGameScene.anims.create({
@@ -167,17 +167,17 @@ export default class Actor {
     
         let newCoords = this.oGameScene.posToCoord(path);
         if (newCoords.x) {
-            this.oSpriteAdd.target.x = newCoords.x;
+            this.oSprite.target.x = newCoords.x;
         }
         if (newCoords.y) {
-            this.oSpriteAdd.target.y = newCoords.y;
+            this.oSprite.target.y = newCoords.y;
         }
     
         this.sCurrDir = direction;
         this.oGameScene.tweens.add({
             targets: this.oSprite,
-            x: this.oSpriteAdd.target.x,
-            y: this.oSpriteAdd.target.y + this.oSpriteAdd.off,
+            x: this.oSprite.target.x,
+            y: this.oSprite.target.y + this.oSprite.off,
             duration: this.nMovingDelay,
             ease: 'Power2',
             onStart: function() {
@@ -196,7 +196,7 @@ export default class Actor {
             this.bWalking = true;
         }
     
-        let target = this.oSpriteAdd.target;
+        let target = this.oSprite.target;
       
         if (direction) {
             this.oSprite.scaleX = direction;

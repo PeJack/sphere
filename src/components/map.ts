@@ -6,20 +6,24 @@ import { GameScene } from '../scenes/gameScene';
 import PreciseShadowcasting from 'rot-js/lib/fov/precise-shadowcasting';
 import Actor from './actor';
 import { IPath } from '../interfaces';
+import { Tilemaps } from 'phaser';
 
 interface ITile extends Phaser.Tilemaps.Tile {
     isExplored?: boolean
 }
 
 export class Map {
-    private oGameScene      : GameScene;
-    private oRotmap         : RotMapCellular;
-    private oTilemap        : Phaser.Tilemaps.Tilemap;
-    private nCols           : number;
-    private nRows           : number;
-    public oTiles           : number[][];
-    private oFov            : RotFovPreciseShadowcasting;
-    private lightBlockCb    : any;
+    public oTiles               : number[][];
+
+    private oGameScene          : GameScene;
+    private oRotmap             : RotMapCellular;
+    private oTilemap            : Phaser.Tilemaps.Tilemap;
+    private nCols               : number;
+    private nRows               : number;
+    private oFov                : RotFovPreciseShadowcasting;
+    private lightBlockCb        : any;
+    private aLastDrawingTiles   : ITile[];
+    private bIsFirstRender      : boolean;
 
     constructor(
         gameScene: GameScene, rotmap: RotMapCellular, 
@@ -32,8 +36,11 @@ export class Map {
         this.nRows = rows;
         this.nCols = cols;
         this.oTiles = JSON.parse(JSON.stringify(this.oRotmap._map));
+        this.bIsFirstRender = true;
+        this.aLastDrawingTiles = [];
 
-        const self = this;
+        const self = this;    
+
         this.lightBlockCb = function (x: number, y: number): boolean {
             x = Math.round(x);
             y = Math.round(y);
@@ -60,42 +67,56 @@ export class Map {
         let tile: ITile;
         let x: number, y: number;
 
-        for (x = 0; x < this.nCols; x++) {
-            for (y = 0; y < this.nRows; y++) {
-                tile = this.oTilemap.getTileAt(x, y, false, this.oTilemap.layers[0]);
-
-                if (tile) {
-                    if (tile.isExplored) {
-                        tile.alpha = 0.1;
-                    } else {
-                        tile.alpha = 0;
-                        tile.visible = false;
-                    }
+        if (!this.bIsFirstRender)
+            this.aLastDrawingTiles.forEach(tile => {
+                if (tile.isExplored) {
+                    tile.alpha = 0.1;
+                } else {
+                    tile.alpha = 0;
+                    tile.visible = false;
                 }
-
-                tile = this.oTilemap.getTileAt(x, y, false, this.oTilemap.layers[1]);
+            });
+        
+        if (this.bIsFirstRender)
+            this.bIsFirstRender = false;
+            for (x = 0; x < this.nCols; x++) {
+                for (y = 0; y < this.nRows; y++) {
+                    tile = this.getTileAt(x, y, this.oGameScene.oLayers.ground.layer);
                 
-                if (tile) {
-                    if (tile.isExplored) {
-                        tile.alpha = 0.1;
-                    } else {
-                        tile.alpha = 0;
-                        tile.visible = false;
+                    if (tile) {
+                        if (tile.isExplored) {
+                            tile.visible = true;
+                            tile.alpha = 0.1;
+                        } else {
+                            tile.alpha = 0;
+                            tile.visible = false;
+                        }
                     }
-                }
 
-                this.oGameScene.aActorsList.forEach(actor => {
-                    if (actor.oPosition.x == x && actor.oPosition.y == y) {
-                        actor.oSprite.alpha = 0;
-                        actor.bVisibleForPlayer = false;
+                    tile = this.getTileAt(x, y, this.oGameScene.oLayers.decoration.layer);
+                
+                    if (tile) {
+                        if (tile.isExplored) {
+                            tile.visible = true;
+                            tile.alpha = 0.1;
+                        } else {
+                            tile.alpha = 0;
+                            tile.visible = false;
+                        }
                     }
-                });
 
-                if (this.oGameScene.oItemsMap.hasOwnProperty(x + "." + y)) {
-                    this.oGameScene.oItemsMap[x + "." + y].alpha = 0;
+                    this.oGameScene.aActorsList.forEach(actor => {
+                        if (actor.oPosition.x == x && actor.oPosition.y == y) {
+                            actor.oSprite.alpha = 0;
+                            actor.bVisibleForPlayer = false;
+                        }
+                    });
+
+                    if (this.oGameScene.oItemsMap.hasOwnProperty(x + "." + y)) {
+                        this.oGameScene.oItemsMap[x + "." + y].alpha = 0;
+                    }
                 }
             }
-        }
 
     }
 
@@ -104,19 +125,24 @@ export class Map {
         const self = this;
 
         this.oGameScene.oPlayer.oSprite.alpha = 1;
+        this.aLastDrawingTiles = [];
 
         this.oFov.compute(this.oGameScene.oPlayer.oPosition.x, this.oGameScene.oPlayer.oPosition.y, 10, function (x, y, r, visibility) {
-            let tile: ITile = self.oTilemap.getTileAt(x, y, false, self.oTilemap.layers[0]);
+            let tile: ITile = self.getTileAt(x, y, self.oGameScene.oLayers.ground.layer); // self.oTilemap.getTileAt(x, y, false, self.oTilemap.layers[1]);
 
             if (tile) {
+                tile.visible = true;
                 tile.alpha = visibility;
                 tile.isExplored = true;
+                self.aLastDrawingTiles.push(tile);
             };
 
-            tile = self.oTilemap.getTileAt(x, y, false, self.oTilemap.layers[1]);
+            tile = self.getTileAt(x, y, self.oGameScene.oLayers.decoration.layer); // self.oTilemap.getTileAt(x, y, false, self.oTilemap.layers[1]);
             if (tile) {
+                tile.visible = true;
                 tile.alpha = visibility;
                 tile.isExplored = true;
+                self.aLastDrawingTiles.push(tile);   
             };
 
             self.oGameScene.aActorsList.forEach(function(actor) {
@@ -155,4 +181,21 @@ export class Map {
 
         return path;
     }
+
+    private getTileAt(x: number, y: number, layer: Tilemaps.LayerData): Phaser.Tilemaps.Tile {
+        if (this.IsInLayerBounds(x, y, layer)) {
+            const tile = layer.data[y][x] || null;
+
+            if (tile === null || tile.index === - 1) {
+                return null;
+            }
+            return tile;
+        } else {
+            return null;
+        }
+    }
+
+    private IsInLayerBounds(x: number, y: number, layer: Tilemaps.LayerData): boolean {
+        return (x >= 0 && x < layer.width && y >= 0 && y < layer.height);
+    };
 }

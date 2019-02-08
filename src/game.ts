@@ -6,14 +6,12 @@ import { GameScene } from "./scenes/gameScene";
 
 const config: GameConfig = {
   title: "Sphere",
-  width: 1024,
-  height: 768,
+  width: window.innerWidth,
+  height: window.innerHeight,
   type: Phaser.AUTO,
   parent: "game",
   scene: [BootScene, GameScene],
-  backgroundColor: "#f000000",
-  pixelArt: true,
-
+  backgroundColor: "#f000000"
 };
 
 export class Game extends Phaser.Game {

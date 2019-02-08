@@ -4,7 +4,7 @@ import Actor from "../components/actor";
 import { MapsManager } from "../systems/mapsManager";
 import { Player } from "../components/player";
 import Item from "../components/item";
-import { IPosition, IGameObject, IPath } from "../interfaces";
+import { IPosition, IPath } from "../interfaces";
 import { ButtonHandler } from "../systems/buttonHandler";
 import { EffectsManager } from "../systems/effectsManager";
 import { ActorsManager } from "../systems/actorsManager";
@@ -17,8 +17,8 @@ interface ILayers {
     items     : Phaser.GameObjects.Group,
     hud       : Phaser.GameObjects.Group,
     actors    : Phaser.GameObjects.Group,
-    ground    : Phaser.Tilemaps.StaticTilemapLayer,
-    decoration: Phaser.Tilemaps.StaticTilemapLayer
+    ground    : Phaser.Tilemaps.DynamicTilemapLayer,
+    decoration: Phaser.Tilemaps.DynamicTilemapLayer
 }
 
 export class GameScene extends Phaser.Scene {
@@ -94,9 +94,9 @@ export class GameScene extends Phaser.Scene {
 
         this.oPlayer = this.oActorsManager.create(0);
 
-        // for (let i = 1; i < 10; i++) {
-        //     this.oActorsManager.create(Helpers.random(1,2));
-        // }
+        for (let i = 1; i < 10; i++) {
+            this.oActorsManager.create(Helpers.random(1,2));
+        }
 
         this.sys.cameras.main.startFollow(this.oPlayer.oSprite);
 
