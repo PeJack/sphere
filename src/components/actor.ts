@@ -2,6 +2,7 @@ import { GameScene } from '../scenes/gameScene';
 import { IPath, IPosition } from '../interfaces';
 import Item from './item';
 import { ButtonHandler, IDownButtons } from '../systems/buttonHandler';
+// import Inventory from './inventory';
 
 //@ts-ignore
 interface ISpriteAdd extends Phaser.GameObjects.Sprite {
@@ -34,6 +35,7 @@ export default class Actor {
     public nDamage              : number;
     public oButtonHandler       : ButtonHandler;
     public oDownButtons         : IDownButtons;
+    // public oInventory           : Inventory;
 
     private bWalking            : boolean;
     private sCurrDir            : string; 
@@ -83,7 +85,9 @@ export default class Actor {
                 "48bitSprites", {
                     // @ts-ignore
                     frames: [0 + this.nSpriteOffset, 1 + this.nSpriteOffset]
-                })
+                }),
+            repeat: -1,
+            frameRate: 8            
         });
 
         this.oGameScene.anims.create({
@@ -94,7 +98,7 @@ export default class Actor {
                     frames: [1 + this.nSpriteOffset, 2 + this.nSpriteOffset, 3 + this.nSpriteOffset, 2 + this.nSpriteOffset],
                 }),
             repeat: -1,
-            frameRate: 8
+            frameRate: 8          
         });
 
         this.oGameScene.anims.create({
@@ -105,7 +109,7 @@ export default class Actor {
                     frames: [7 + this.nSpriteOffset, 8 + this.nSpriteOffset, 9 + this.nSpriteOffset, 8 + this.nSpriteOffset]
                 }),
             repeat: -1,
-            frameRate: 8
+            frameRate: 8,
         });
 
         this.oGameScene.anims.create({
@@ -179,7 +183,7 @@ export default class Actor {
             x: this.oSprite.target.x,
             y: this.oSprite.target.y + this.oSprite.off,
             duration: this.nMovingDelay,
-            ease: 'Power2',
+            ease: 'Linear',
             onStart: function() {
                 this.startWalk(this.oDirectionScale[direction]);
             },

@@ -38,7 +38,7 @@ export class MapsManager {
         this.oTilemap = this.oGameScene.make.tilemap({
             data: this.oMapData._map,
             tileWidth: tileWidth,
-            tileHeight: tileHeight,            
+            tileHeight: tileHeight,
             width: width,
             height: height,
         });
@@ -261,31 +261,31 @@ export class MapsManager {
         );
 
         // 2 Последних паттерна - декорации (пни)
-        addPattern(
-            '*1*' + 
-            '***' + 
-            '*1*',
-            function () {
-                self.oGameScene.oLayers.ground.putTileAt(GROUND_TILE, tilepos.x, tilepos.y);
-                // tilemap.layers[0].data[tilepos] = GROUND_TILE;
-                let f = [17, 22, 17][Math.floor(Math.random() * 3)][0];
-                self.oGameScene.oLayers.decoration.putTileAt(f, tilepos.x, tilepos.y);
-                // tilemap.layers[1].data[tilepos] = f;
-            }
-        );
+        // addPattern(
+        //     '*1*' + 
+        //     '***' + 
+        //     '*1*',
+        //     function () {
+        //         self.oGameScene.oLayers.ground.putTileAt(GROUND_TILE, tilepos.x, tilepos.y);
+        //         // tilemap.layers[0].data[tilepos] = GROUND_TILE;
+        //         let f = [17, 22, 17][Math.floor(Math.random() * 3)][0];
+        //         self.oGameScene.oLayers.decoration.putTileAt(f, tilepos.x, tilepos.y);
+        //         // tilemap.layers[1].data[tilepos] = f;
+        //     }
+        // );
 
-        addPattern(
-            '***' + 
-            '1*1' + 
-            '***',
-            function () {
-                self.oGameScene.oLayers.ground.putTileAt(GROUND_TILE, tilepos.x, tilepos.y);
-                // tilemap.layers[0].data[tilepos] = GROUND_TILE;
-                let f = [17, 22, 17][Math.floor(Math.random() * 3)][0];
-                self.oGameScene.oLayers.decoration.putTileAt(f, tilepos.x, tilepos.y);
-                // tilemap.layers[1].data[tilepos] = f;
-            }
-        );
+        // addPattern(
+        //     '***' + 
+        //     '1*1' + 
+        //     '***',
+        //     function () {
+        //         self.oGameScene.oLayers.ground.putTileAt(GROUND_TILE, tilepos.x, tilepos.y);
+        //         // tilemap.layers[0].data[tilepos] = GROUND_TILE;
+        //         let f = [17, 22, 17][Math.floor(Math.random() * 3)][0];
+        //         self.oGameScene.oLayers.decoration.putTileAt(f, tilepos.x, tilepos.y);
+        //         // tilemap.layers[1].data[tilepos] = f;
+        //     }
+        // );
 
         for (let y = 0; y < this.oMapData._height; y++) {
             for (let x = 0; x < this.oMapData._width; x++) {
@@ -328,10 +328,6 @@ export class MapsManager {
         path.x = Math.round(path.x);
         path.y = Math.round(path.y);
 
-        return path.x >= 0 &&
-            path.x < this.nRows &&
-            path.y >= 0 &&
-            path.y < this.nCols &&
-            this.oMap.oTiles[path.x][path.y] === 0;
+        return this.oMap.oTiles[path.x][path.y] === 0;
     }
 }

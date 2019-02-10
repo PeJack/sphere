@@ -11,6 +11,7 @@ import { ActorsManager } from "../systems/actorsManager";
 import { ItemsManager } from "../systems/itemsManager";
 import { InputHandler } from "../systems/InputHandler";
 import Helpers from "../helpers";
+// import Inventory from "../components/inventory";
 
 interface ILayers {
     effects   : Phaser.GameObjects.Group,
@@ -80,7 +81,7 @@ export class GameScene extends Phaser.Scene {
         this.oEffectsManager    = new EffectsManager(this);
         
         this.oActorsManager.init();
-        this.oItemsManager.init();
+        this.oItemsManager.init();      
         
         this.run();
     }
@@ -98,8 +99,12 @@ export class GameScene extends Phaser.Scene {
             this.oActorsManager.create(Helpers.random(1,2));
         }
 
-        this.sys.cameras.main.startFollow(this.oPlayer.oSprite);
 
+        // this.oInventory = new Inventory(this, this.oPlayer);
+        // this.oPlayer.oInventory = this.oInventory;
+
+        this.cameras.main.setBounds(0, 0, this.oMapsManager.nCols * this.nTileSize, this.oMapsManager.nRows * this.nTileSize);        
+        this.cameras.main.startFollow(this.oPlayer.oSprite);
         this.oMapsManager.oMap.light();
     }
 
@@ -136,5 +141,5 @@ export class GameScene extends Phaser.Scene {
             worldX: (obj.worldX - this.nTileSize / 2) / this.nTileSize,
             worldY: (obj.worldY - this.nTileSize / 2) / this.nTileSize
       }
-    }
+    }  
 }
