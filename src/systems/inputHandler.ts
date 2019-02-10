@@ -42,6 +42,7 @@ export class InputHandler {
 
     handleInputButton(): void {
         if (this.oButtonHandler.update() && this.sAction != "waiting" && this.bActive) {
+            
             if (this.oDownButtons.UP) {
                 this.startWalk(
                     [{y: this.oGameScene.oPlayer.getPosition().y - 1}],

@@ -134,7 +134,7 @@ export default class Actor {
     }
 
     walkToTile(path?: IPath, direction?: string, callback?: Function, context?: Class): void {
-        if (!path || (!path.x && !path.y)) {
+        if (!path || (path.x === undefined && path.y === undefined)) {
             if (typeof callback == "function") {
                 callback.call(context);
             }
@@ -143,12 +143,12 @@ export default class Actor {
         }
 
         let checkingPath = path;
-        if (!checkingPath.x) {
+        if (checkingPath.x === undefined) {
             checkingPath.x = this.getPosition().x;
-        } else if (!checkingPath.y) {
+        } else if (checkingPath.y === undefined) {
             checkingPath.y = this.getPosition().y;
         }
-
+        
         if (!this.oGameScene.oMapsManager.isWalkable(checkingPath)) {
             if (typeof callback == "function") {
                 callback.call(context);

@@ -82,8 +82,23 @@ export class Enemy extends Actor {
                 this.moveTo(path);
             }, this)
         } else {
-            this.bAlerted = false;
-            this.bAlertedHasFinished = false;
+            if (!this.bAlertedHasFinished) {
+                path = this.oGameScene.oMapsManager.oMap.pathFinding(this, this.oGameScene.oPlayer);
+                if (path.length > 1) path.shift();
+                if (path.length == 1) {
+                    this.bAlerted = false;
+                    return;
+                }
+
+                firstPath = path.shift();
+
+                this.walkToTile(firstPath, null, function() {
+                    this.moveTo(path);
+                }, this)
+            } else {
+                this.bAlerted = false;
+                this.bAlertedHasFinished = false;
+            }
         }
         
     }

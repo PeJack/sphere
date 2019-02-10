@@ -65,9 +65,8 @@ export class Map {
 
     resetLight() : void {
         let tile: ITile;
-        let x: number, y: number;
 
-        if (!this.bIsFirstRender)
+        if (!this.bIsFirstRender) {      
             this.aLastDrawingTiles.forEach(tile => {
                 if (tile.isExplored) {
                     tile.alpha = 0.1;
@@ -75,10 +74,24 @@ export class Map {
                     tile.alpha = 0;
                     tile.visible = false;
                 }
+
+                this.oGameScene.aActorsList.forEach(actor => {
+                    if (actor.oPosition.x == tile.x && actor.oPosition.y == tile.y) {
+                        // actor.oSprite.alpha = 0;
+                        actor.bVisibleForPlayer = false;
+                    }
+                });
+
+                if (this.oGameScene.oItemsMap.hasOwnProperty(tile.x + "." + tile.y)) {
+                    this.oGameScene.oItemsMap[tile.x + "." + tile.y].alpha = 0;
+                }                
             });
+        }
         
-        if (this.bIsFirstRender)
+        if (this.bIsFirstRender) {
+            let x: number, y: number;            
             this.bIsFirstRender = false;
+
             for (x = 0; x < this.nCols; x++) {
                 for (y = 0; y < this.nRows; y++) {
                     tile = this.getTileAt(x, y, this.oGameScene.oLayers.ground.layer);
@@ -107,7 +120,7 @@ export class Map {
 
                     this.oGameScene.aActorsList.forEach(actor => {
                         if (actor.oPosition.x == x && actor.oPosition.y == y) {
-                            actor.oSprite.alpha = 0;
+                            // actor.oSprite.alpha = 0;
                             actor.bVisibleForPlayer = false;
                         }
                     });
@@ -117,7 +130,7 @@ export class Map {
                     }
                 }
             }
-
+        }
     }
 
     computeLight() : void {
@@ -147,7 +160,7 @@ export class Map {
 
             self.oGameScene.aActorsList.forEach(function(actor) {
                 if (actor.oPosition.x == x && actor.oPosition.y == y) {
-                    actor.oSprite.alpha = visibility;
+                    // actor.oSprite.alpha = visibility;
                     actor.bVisibleForPlayer = true;
                 }
             });

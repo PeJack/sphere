@@ -325,9 +325,10 @@ export class MapsManager {
     };
 
     public isWalkable(path: IPath) : boolean {
-        path.x = Math.round(path.x);
-        path.y = Math.round(path.y);
-
-        return this.oMap.oTiles[path.x][path.y] === 0;
+        return path.x >= 0 &&
+            path.x < this.nRows &&	
+            path.y >= 0 &&	
+            path.y < this.nCols &&	
+            this.oMap.oTiles[path.x][path.y] === 0;
     }
 }
