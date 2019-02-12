@@ -172,7 +172,6 @@ export class Map {
     }
 
     public computeVisibilityBetween(actor1: Actor, actor2: Actor) : boolean {
-        const self = this;
         let visible = false;
 
         this.oFov.compute(actor1.oPosition.x, actor1.oPosition.y, 10, function (x, y, r, visibility) {

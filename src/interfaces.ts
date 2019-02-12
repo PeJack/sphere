@@ -78,13 +78,21 @@ export interface ISpriteOffset {
   * @param index37 перезарядка
   */
 export interface IItem {
+    /** id */
     0: number,
+    /** класс */    
     1: string,
+    /** человеческое название */    
     2: string,
+    /** название спрайта */     
     3: string,
+    /** ? */
     4: number,
+    /** уровень */
     5: number,
+    /** урон */
     18: number,
+    /** перезарядка */
     37: number
 }
 

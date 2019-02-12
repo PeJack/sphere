@@ -10,7 +10,7 @@ interface IRangeObject extends Phaser.GameObjects.Graphics {
 
 class Item extends Phaser.GameObjects.Sprite {
     private oGameScene      : GameScene;
-    private oActor          : Actor;
+    public oActor           : Actor;
     private oGroup          : Phaser.GameObjects.Group;
     private oRangeObject    : IRangeObject;
     private oVisualTimer    : VisualTimer;
@@ -18,23 +18,26 @@ class Item extends Phaser.GameObjects.Sprite {
     private sSpriteName     : string;
     private sType           : string;
     private sAttackType     : string;
-    private nId             : number;
-    private nStack          : number;
-    private nMaxStack       : number;
+    public nId              : number;
+    public nStack           : number;
+    public nMaxStack        : number;
     private nRange          : number;
     private nReloadTime     : number;
     private nDamage         : number;
-    private nLevel          : number;
+    public nLevel           : number;
     private aData           : IItem;
     private fEffect         : Function;
+    public oSlot            : any;
     
-    public oLastPos         : IPosition;        
+    public oLastPos         : IPosition;
+    public bProcessAgain    : boolean;        
     
     constructor(gameScene : GameScene, aData : IItem, pos : IPosition, actor : Actor) {
-        super(gameScene, pos.x, pos.y, aData[3]); 
+        super(gameScene, pos.x, pos.y, aData[3], 0); 
+
         this.oGameScene     = gameScene;
         this.oGroup         = this.oGameScene.oLayers.items;
-        this.oGroup.add(this);
+        this.oGroup.add(this, true);
 
         this.oActor         = actor;
         this.aData          = aData;

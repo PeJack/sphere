@@ -1,355 +1,390 @@
-// import Helpers from '../helpers';
-// import { GameScene } from '../scenes/gameScene';
-// import Actor from './actor';
+import Helpers from '../helpers';
+import { GameScene } from '../scenes/gameScene';
+import Actor from './actor';
+import Item from './item';
 
 
-// export default class Inventory {
-//     private oGameScene  : GameScene;
-//     private oActor      : Actor;
-//     private oGroup      : Phaser.GameObjects.Group;
-//     private oActiveItem : Phaser.GameObjects.Group;
-//     private aPending    : Array<Phaser.GameObjects.Group>;
-//     private aItems      : Array<Phaser.GameObjects.Group>;
-//     private nSlots      : number;
-//     private nPadding    : number;
-//     private nIconSize   : number;
-//     private nCols       : number;
-//     private nWidth      : number;
-//     private nHeight     : number;
-//     private oHeader     : any;
-//     private oBackground : any;
-//     private oFakeBg     : any;
+//@ts-ignore
+interface IInventoryContainer extends Phaser.GameObjects.Container {
+    slots?      : IIinvetorySprite[],
+    items?      : IIinvetorySprite[]
+}
 
-//   constructor(gameScene : GameScene, actor : Actor) {
-//     this.oGameScene = gameScene;
-//     this.oActor     = actor;
-//     this.oGroup     = this.oGameScene.oLayers.hud;
+interface IIinvetorySprite extends Phaser.GameObjects.Sprite {
+    decor?      : Phaser.GameObjects.Sprite,
+    special?    : boolean,
+    item?       : Item,
+    slots?      : IIinvetorySprite[],
+    items?      : Item[]
+}
+
+export default class Inventory {
+    private oGameScene              : GameScene;
+    private oActor                  : Actor;
+    private oGroup                  : Phaser.GameObjects.Group;
+    private oActiveItem             : Phaser.GameObjects.Group;
+    private aPending                : Item[];
+    private aItems                  : Item[];
+    private nSlots                  : number;
+    private nPadding                : number;
+    private nIconSize               : number;
+    private nCols                   : number;
+    private nWidth                  : number;
+    private nHeight                 : number;
+    private oHeader                 : IIinvetorySprite;
+    private oBackground             : IIinvetorySprite;
+    private oFakeBg                 : IIinvetorySprite;
+    private oInventoryContainer     : Phaser.GameObjects.Container;
+    private oBackgroundContainer    : Phaser.GameObjects.Container;        
+
+  constructor(gameScene : GameScene, actor : Actor) {
+    this.oGameScene = gameScene;
+    this.oActor     = actor;
+    this.oGroup     = this.oGameScene.oLayers.hud;
     
-//     this.aPending = [];
-//     this.aItems   = [];
-//     this.nSlots   = 15;
+    this.aPending = [];
+    this.aItems   = [];
+    this.nSlots   = 15;
 
-//     this.nPadding   = 2;
-//     this.nIconSize  = 35;
-//     this.nCols      = 5;
+    this.nPadding   = 2;
+    this.nIconSize  = 35;
+    this.nCols      = 5;
 
-//     this.oActiveItem = null;
+    this.oActiveItem = null;
     
-//     this.nWidth = 
-//       (this.nIconSize * this.nCols) + 
-//       (this.nPadding * this.nCols) + 
-//       this.nPadding;
+    this.nWidth = 
+      (this.nIconSize * this.nCols) + 
+      (this.nPadding * this.nCols) + 
+      this.nPadding;
     
-//     this.nHeight =
-//       (this.nIconSize * 
-//       Math.ceil(this.nSlots / this.nCols)) +
-//       this.nPadding *
-//       Math.ceil(this.nSlots / this.nCols) +
-//       this.nPadding;
+    this.nHeight =
+      (this.nIconSize * 
+      Math.ceil(this.nSlots / this.nCols)) +
+      this.nPadding *
+      Math.ceil(this.nSlots / this.nCols) +
+      this.nPadding;
     
-//     this.oHeader = this.oGroup.create(window.screen.width - (this.nWidth + 90), 30, "inventory", 1);
-//     this.oHeader.width = this.nWidth + 90;
-//     this.oHeader.fixedToCamera = true;
-//     this.oHeader.inputEnabled = true;
-//     this.oHeader.input.enableDrag();
-//     this.oHeader.input.useHandCursor = true;
 
-//     let bgGraphics  = this.oGameScene.make.bitmapData(this.nWidth, this.nHeight);
-//     this.oBackground = this.oGroup.create(this.oHeader.x + 18, this.oHeader.y + 30, bgGraphics);
-//     this.oBackground.width = this.nWidth + 50;
-//     this.oBackground.height = this.nHeight + 15;  
+    this.oInventoryContainer    = this.oGameScene.add.container(window.innerWidth - (this.nWidth + 90) / 2, 30);
+    this.oInventoryContainer.setScrollFactor(0, 0);
 
-//     this.oBackground.fixedToCamera = true;
-//     this.oBackground.slots = [];
-//     this.oBackground.items = [];
-
-//     this.oFakeBg = this.oGroup.create(this.oHeader.x - 4, this.oHeader.y + 30, "inventory", 0);
-//     this.oFakeBg.width = this.nWidth + 100;
-//     this.oFakeBg.height = this.nHeight + 35;
-//     this.oFakeBg.fixedToCamera = true;
-
-//     this.oBackground.bringToTop();
-
-//     this.oHeader.events.onDragUpdate.add(function(sprite, pointer, dragX, dragY) {
-//       this.oBackground.cameraOffset.setTo(sprite.cameraOffset.x + 18, sprite.cameraOffset.y + 30);
-//       this.oFakeBg.cameraOffset.setTo(sprite.cameraOffset.x - 4, sprite.cameraOffset.y + 30);
-//     }, this);
-
-
-//     let count = 0, decor, slot;
-//     for (let y = this.nPadding + 5; y < this.nHeight; y += this.nIconSize + this.nPadding) {
-//       for (let x = this.nPadding; x < this.nWidth; x += this.nIconSize + this.nPadding) {
-//         if (count < this.nSlots) {
-//           if (count < 5) {
-//             let index = count + 3 == 6 ? 5 : count + 3 > 6 ? count + 2 : count  + 3;
-//             decor = this.oGameScene.add.sprite(x, y + 2, "inventory", index);
-//             decor.alpha = 0.1;
-//             decor.width = this.nIconSize;
-//             decor.height = this.nIconSize - 3;
-//             this.oBackground.addChild(decor);
-//           } else {
-//             let decorGraphics  = this.oGameScene.make.bitmapData(this.nIconSize, this.nIconSize);
-//             decorGraphics.ctx.fillStyle = 'rgba(68, 131, 65, 1)';
-//             decorGraphics.ctx.fillRect(0, 0, this.nIconSize, this.nIconSize);
-//             decor = this.oGameScene.add.sprite(x, y, decorGraphics);
-//             decor.addChild(this.oGameScene.add.sprite(3, 3, "ic_hand"));
-
-//             decor.visible = false;
-//             this.oBackground.addChild(decor);
-//           }
-//           slot = this.oGameScene.add.sprite(x, y, "inventory", count < 5 ? 15 : 16);
- 
-//           slot.width = this.nIconSize;
-//           slot.height = this.nIconSize;
-//           slot.special = count < 5;
-//           slot.decor = decor;
-//           slot.tint = 0x736861;
-
-//           this.oBackground.addChild(slot);
-//           this.oBackground.slots.push(slot);
-
-//           count += 1;
-//         }
-//       }
-//     }
-
-//     let text = this.oGameScene.add.text(this.nPadding + 20, this.nPadding + 10, "Инвентарь", {font: '14px Courier New', fill: '#ffffff'});
-//     this.oHeader.addChild(text);
-
-//     let self = this;
-//     this.oGameScene.input.keyboard.onDownCallback = function(e) {
-//       if (e.keyCode == 73) { // 73 = I
-//         self.open();
-//       }
-//     }
-//   }
-
-//   update() {
-//     while (this.aPending.length > 0) {
-//       this.processItem(this.aPending.shift());
-//     }
-//   }
-
-//   open() {
-//     // this.header.visible = !this.header.visible;
-//     this.oBackground.visible = !this.oBackground.visible;
-//     this.oFakeBg.visible = !this.oFakeBg.visible;
-//   }
-
-//   addItem(item) {
-//     this.aPending.push(item);
-//   }
-
-//   processItem(item) {
-//     let stackSlot = this.findSlotWithSameItem(item);
-//     this.oGameScene.oLayers.items.remove(item);
-//     delete this.oGameScene.oItemsMap[item.lastPos.x + "." + item.lastPos.y];
+    this.oHeader = this.oGroup.create(0, 0, "inventory", "1.png");
+    // this.oHeader.displayWidth = this.nWidth + 60;
     
-//     item.alpha = 1;
+    // FixedToCamera
+    this.oHeader.setScrollFactor(0, 0);
 
-//     if (!Helpers.find(item.children, "title", "levelText") && item.level) {
-//       let levelText = this.oGameScene.add.text(0, 0, Helpers.romanize(item.level), {font: '8px Courier New', fill: '#ffffff'});
-//       levelText.text = "levelText";
-//       item.addChild(levelText);
-//       levelText.y = item.getLocalBounds().height - 10;      
-//     }
+    this.oBackgroundContainer = this.oGameScene.add.container(this.oHeader.x + 18, this.oHeader.y + 30);
+    this.oBackground = this.oGroup.create(0, 0);
+    // this.oBackground.displayWidth = this.nWidth + 40;
+    // this.oBackground.displayHeight = this.nHeight + 15;
+    this.oBackgroundContainer.setScrollFactor(0, 0);    
+    this.oBackground.setScrollFactor(0, 0);
+    this.oBackground.slots = [];
+    this.oBackground.items = [];
+    this.oBackground.setVisible(false);
+    this.oBackgroundContainer.add(this.oBackground);
 
-//     if (item.maxStack && stackSlot) {
-//       if ((stackSlot.item.stack + item.stack) > stackSlot.item.maxStack) {
-//         let diff = (stackSlot.item.stack + item.stack) - stackSlot.item.maxStack;
-//         stackSlot.item.stack += (item.stack - diff);
-//         item.stack -= diff;
-//         item.processAgain = true;
-//       } else {
-//         stackSlot.item.stack += item.stack;
-//       }
+    this.oFakeBg = this.oGroup.create(this.oHeader.x + 2, this.oHeader.y + 75, "inventory", 0);
+    this.oFakeBg.displayHeight = this.nHeight + 10;
+    this.oFakeBg.setScrollFactor(0, 0);
 
-//       // обновление текста стака или его создание
-//       if (Helpers.find(stackSlot.item.children, "title", "stackText")) {
-//         let stackText = Helpers.find(stackSlot.item.children, "title", "stackText");
-//         stackText.setText(stackSlot.item.stack);
-//         stackText.x = stackSlot.item.getLocalBounds().width - stackText.width - 5; 
-//         stackText.y = 3;
-//       } else {
-//         let stackText = this.oGameScene.add.text(0, 0, stackSlot.item.stack, {font: '9px Courier New', fill: '#ffffff'});
-//         stackText.text = "stackText";
-//         stackSlot.item.addChild(stackText); 
-//         stackText.x = stackSlot.item.getLocalBounds().width - stackText.width - 5;  
-//         stackText.y = 3;     
-//       }
+    this.oInventoryContainer.add(this.oHeader);
+    this.oInventoryContainer.add(this.oBackgroundContainer);
+    this.oInventoryContainer.add(this.oFakeBg);
+    this.oInventoryContainer.bringToTop(this.oBackgroundContainer);
 
-//       if (item.processAgain) {
-//         return this.processItem(item);
-//       }
+    this.oInventoryContainer.setInteractive(new Phaser.Geom.Rectangle(this.oHeader.x - this.nWidth / 2, -9, this.nWidth, 18), Phaser.Geom.Rectangle.Contains);
+    this.oGameScene.input.setDraggable(this.oInventoryContainer);
 
-//       item.kill();
-//       this.oGroup.remove(item)
-//       // removeChild(item);
-//     } else {
-//       let emptySlot = this.findFirstEmptySlot();
+    this.oInventoryContainer.on("drag", (pointer: any, dragX: number, dragY: number) => {
+        this.oInventoryContainer.setPosition(dragX, dragY);
 
-//       if (emptySlot) {
-//         item.x = emptySlot.x;
-//         item.y = emptySlot.y;
-//         item.width = this.nIconSize;
-//         item.height = this.nIconSize;
-//         item.inputEnabled = true;
-//         item.input.enableDrag();
-//         item.input.useHandCursor = true;
+    }, this);
 
-//         this.oBackground.addChild(item);
-//         emptySlot.item = item;
-//         item.slot = emptySlot;
-//         item.actor = this.oActor;
 
-//         if (Helpers.find(emptySlot.item.children, "title", "stackText")) {
-//           let stackText = Helpers.find(emptySlot.item.children, "title", "stackText");
-//           stackText.setText(emptySlot.item.stack);
-//           stackText.x = emptySlot.item.getLocalBounds().width - stackText.width - 5;
-//           stackText.y = 3; 
-//         }
+    let count = 0;
+    const decorGraphics  = this.oGameScene.textures.createCanvas("decorGraphics", this.nIconSize, this.nIconSize);
+    decorGraphics.context.fillStyle = 'rgba(68, 131, 65, 1)';
+    decorGraphics.context.fillRect(0, 0, this.nIconSize, this.nIconSize);
 
-//         this.aItems.push(item);
+    let decor: IIinvetorySprite, slot: IIinvetorySprite, ic_hand: IIinvetorySprite;
+    for (let y = this.nPadding + 5; y < this.nHeight; y += this.nIconSize + this.nPadding) {
+        for (let x = this.nPadding; x < this.nWidth; x += this.nIconSize + this.nPadding) {
+            if (count < this.nSlots) {
+                if (count < 5) {
+                    const index = count + 3 == 6 ? 5 : count + 3 > 6 ? count + 2 : count + 3;
 
-//         let heldItemSlot;
+                    decor = this.oGameScene.add.sprite(x - this.nWidth / 2, y, "inventory", index + ".png");
+                    decor.alpha = 0.1;
+                    decor.displayWidth = this.nIconSize;
+                    decor.displayHeight = this.nIconSize - 3;
 
-//         item.events.onDragStart.add(function (heldItem, pointer) {
-//           this.oBackground.removeChild(heldItem);
-//           this.oBackground.addChild(heldItem);
+                    this.oBackgroundContainer.add(decor);
+                } else {            
+                    const decorContainer: Phaser.GameObjects.Container = this.oGameScene.add.container(0, 0);
+                    decor = this.oGameScene.add.sprite(x - this.nWidth / 2, y, "decorGraphics");
+                    ic_hand = this.oGameScene.add.sprite(3, 3, "ic_hand");
+                    decorContainer.add(decor);
+                    decorContainer.add(ic_hand);
 
-//           heldItemSlot = heldItem.slot;
-//         }, this);
+                    ic_hand.visible = false;
 
-//         item.events.onDragStop.add(function (heldItem, pointer) {
-//           let closestSlot = this.findClosestSlotTo(heldItem);
+                    this.oBackgroundContainer.add(decorContainer);
+                }
 
-//           if (closestSlot) {
-//             // ближайший слот содержит предмет
-//             if (closestSlot.item != undefined) {
+                const i = count < 5 ? 15 : 16;
+                slot = this.oGameScene.add.sprite(x - this.nWidth / 2, y, "inventory", i + ".png");
+                
+                slot.displayWidth = this.nIconSize;
+                slot.displayHeight = this.nIconSize;
+                slot.special = count < 5;
+                slot.decor = decor;
+                slot.tint = 0x736861;
 
-//               let closestItem = closestSlot.item;
+                this.oBackgroundContainer.add(slot);
+                this.oBackground.slots.push(slot);
 
-//               // поменять предметы местами
-//               closestItem.x = heldItemSlot.x;
-//               closestItem.y = heldItemSlot.y;
+                count += 1;
+            }
+        }
+    }
 
-//               closestItem.slot = heldItemSlot;
-//               heldItem.slot = closestSlot;
+    const text = this.oGameScene.add.text(-this.nWidth / 2 + 10, -4, "Инвентарь", {font: '14px Courier New', fill: '#ffffff'});
+    this.oInventoryContainer.add(text);
 
-//               closestSlot.item = heldItem;
-//               heldItemSlot.item = closestItem;
+    const self = this;
+    this.oGameScene.input.keyboard.on("keydown", function(e: KeyboardEvent) {
+        if (e.keyCode == 73) {
+            self.open()
+        }
+    });
+  }
 
-//             } else { // если слот пустой
-//               heldItem.slot = closestSlot;
-//               closestSlot.item = heldItem;
+    update() {
+        while (this.aPending.length > 0) {
+            this.processItem(this.aPending.shift());
+        }
+    }
 
-//               heldItemSlot.item = null;
+    open(): void {
+        this.oBackgroundContainer.visible = !this.oBackgroundContainer.visible;
+        this.oFakeBg.visible = !this.oFakeBg.visible;
+        // this.oInventoryContainer.visible = !this.oInventoryContainer.visible
+    }
 
-//             }
+    addItem(item: Item): void {
+        this.aPending.push(item);
+    }
 
-//             // переместить предмет в ближайший слот
-//             heldItem.x = closestSlot.x;
-//             heldItem.y = closestSlot.y;
-            
-//           } else { // выбросить предмет
-//             item.slot.item = undefined;
-//             this.oBackground.removeChild(item);
-//             this.aItems.splice(this.aItems.indexOf(item), 1);
-            
-//             // вернуть предмет обратно в мир
-//             item.width = this.oGameScene.tilesize;
-//             item.height = this.oGameScene.tilesize;
+    processItem(item: Item): void {
+        let stackSlot = this.findSlotWithSameItem(item);
+        this.oGameScene.oLayers.items.remove(item);
+        delete this.oGameScene.oItemsMap[item.oLastPos.x + "." + item.oLastPos.y];
+    
+        item.alpha = 1;
 
-//             item.x = this.oActor.sprite.x;
-//             item.y = this.oActor.sprite.y;
-//             item.lastPos.x = this.oActor.position.x;
-//             item.lastPos.y = this.oActor.position.y;
+        // if (!Helpers.find(item.children, "title", "levelText") && item.nLevel) {
+        //     let levelText = this.oGameScene.add.text(0, 0, Helpers.romanize(item.nLevel), {font: '8px Courier New', fill: '#ffffff'});
+        //     levelText.text = "levelText";
+        //     item.addChild(levelText);
+   
+        //     levelText.y = item.getBounds().height - 10;      
+        // }
 
-//             item.events.destroy();
+        if (item.nMaxStack && stackSlot) {
+            if ((stackSlot.item.nStack + item.nStack) > stackSlot.item.nMaxStack) {
+                let diff = (stackSlot.item.nStack + item.nStack) - stackSlot.item.nMaxStack;
+                stackSlot.item.nStack += (item.nStack - diff);
+                item.nStack -= diff;
+                item.bProcessAgain = true;
+            } else {
+                stackSlot.item.nStack += item.nStack;
+            }
 
-//             this.oGameScene.layers.items.add(item);
-//             this.oGameScene.itemsMap[item.lastPos.x + "." + item.lastPos.y] = item;            
-//           }
-//         }, this);
+            // обновление текста стака или его создание
+            // if (Helpers.find(stackSlot.item.children, "title", "stackText")) {
+            //     let stackText = Helpers.find(stackSlot.item.children, "title", "stackText");
+            //     stackText.setText(stackSlot.item.stack);
+            //     stackText.x = stackSlot.item.getLocalBounds().width - stackText.width - 5; 
+            //     stackText.y = 3;
+            // } else {
+            //     let stackText = this.oGameScene.add.text(0, 0, stackSlot.item.stack, {font: '9px Courier New', fill: '#ffffff'});
+            //     stackText.text = "stackText";
+            //     stackSlot.item.addChild(stackText); 
+            //     stackText.x = stackSlot.item.getLocalBounds().width - stackText.width - 5;  
+            //     stackText.y = 3;     
+            // }
 
-//         item.events.onInputDown.add(function (item, pointer) {
-//           if (pointer.rightButton.isDown) {
-//             if (item.stack > 1) {
-//               item.stack -= 1;
-//               Helpers.find(item.children, "title", "stackText").setText(item.stack);
-//               this.oGameScene.itemsManager.create(item.id, this.oActor.sprite, null);
-//             } else {
-//               item.kill();
-//               item.slot.item = undefined;
-//               this.oBackground.removeChild(item);
-//               this.aItems.splice(this.aItems.indexOf(item), 1);
-//               this.oGameScene.itemsManager.create(item.id, this.oActor.sprite, null);              
-//             }
-//           }
+            if (item.bProcessAgain) {
+                return this.processItem(item);
+            }
 
-//           if (pointer.leftButton.isDown) {
-//             if (this.oActiveItem && this.oActiveItem.reloading) { return };
-             
-//             item.slot.decor.visible = !item.slot.decor.visible;
+            item.destroy();
+            this.oGroup.remove(item)
+            // removeChild(item);
+        } else {
+            let emptySlot = this.findFirstEmptySlot();
 
-//             if (item.slot.decor.visible) {
-//               if (this.oActiveItem) {
-//                 this.oActiveItem.rangeObject.visible = false;
-//                 this.oActiveItem.slot.decor.visible = false;
-//               }
-              
-//               item.slot.tint = 0x304876;
-//               this.oActiveItem = item;
-//               this.oActor.weapon = item;
-//               this.oActor.weapon.rangeObject.visible = true;
-//             } else {
-//               this.oActiveItem = undefined;
+            if (emptySlot) {
+                item.x = emptySlot.x;
+                item.y = emptySlot.y;
+                item.width = this.nIconSize;
+                item.height = this.nIconSize;
 
-//               this.oActor.weapon.rangeObject.visible = false;
-//               this.oActor.weapon = undefined;
-//             }
-//           }
-//         }, this);
-//       }
-//     }
-//   }
+                item.setInteractive();
+                this.oGameScene.input.setDraggable(item);
 
-//   findSlotWithSameItem(item) {
-//     for(let i = 0; i < this.oBackground.slots.length; i++) {
-//       let slot = this.oBackground.slots[i];
+                this.oBackgroundContainer.add(item);
+                emptySlot.item = item;
+                item.oSlot = emptySlot;
+                item.oActor = this.oActor;
 
-//       if(slot.item) {
-//         if(slot.item.id == item.id
-//         && slot.item.stack < slot.item.maxStack)
-//             return slot;
-//       }
-//     }
-//     return false;
-//   }
+                // if (Helpers.find(emptySlot.item.children, "title", "stackText")) {
+                //   let stackText = Helpers.find(emptySlot.item.children, "title", "stackText");
+                //   stackText.setText(emptySlot.item.stack);
+                //   stackText.x = emptySlot.item.getLocalBounds().width - stackText.width - 5;
+                //   stackText.y = 3; 
+                // }
 
-//   findFirstEmptySlot() {
-//     for(var i = 0; i < this.oBackground.slots.length; i++) {
-//       let slot = this.oBackground.slots[i];
-//       if(slot.item == undefined && !slot.special) {
-//         return slot;
-//       }
-//     }
-//     return false;
-//   }
+                this.aItems.push(item);
 
-//   findClosestSlotTo(sprite) {
-//     let closestSlot, dist;
-//     let lastDist = 50; 
+                // let heldItemSlot;
 
-//     this.oBackground.slots.forEach(function(slot) {
-//       dist = this.oGameScene.game.math.distance(slot.x, slot.y, sprite.x, sprite.y);
-      
-//       if(dist < lastDist) {
-//         lastDist = dist;
-//         closestSlot = slot;
-//       }
-//     }, this);
+                // item.events.onDragStart.add(function (heldItem, pointer) {
+                //     this.oBackground.removeChild(heldItem);
+                //     this.oBackground.addChild(heldItem);
 
-//     return closestSlot;
-//   }
-// }
+                //     heldItemSlot = heldItem.slot;
+                // }, this);
+
+                // item.events.onDragStop.add(function (heldItem, pointer) {
+                //     let closestSlot = this.findClosestSlotTo(heldItem);
+
+                //     if (closestSlot) {
+                //         // ближайший слот содержит предмет
+                //         if (closestSlot.item != undefined) {
+                //             let closestItem = closestSlot.item;
+
+                //             // поменять предметы местами
+                //             closestItem.x = heldItemSlot.x;
+                //             closestItem.y = heldItemSlot.y;
+
+                //             closestItem.slot = heldItemSlot;
+                //             heldItem.slot = closestSlot;
+
+                //             closestSlot.item = heldItem;
+                //             heldItemSlot.item = closestItem;
+                //         } else { // если слот пустой
+                //             heldItem.slot = closestSlot;
+                //             closestSlot.item = heldItem;
+
+                //             heldItemSlot.item = null;
+
+                //         }
+                  
+                //         // переместить предмет в ближайший слот
+                //         heldItem.x = closestSlot.x;
+                //         heldItem.y = closestSlot.y;
+
+                //     } else { // выбросить предмет
+                //         item.slot.item = undefined;
+                //         this.oBackground.removeChild(item);
+                //         this.aItems.splice(this.aItems.indexOf(item), 1);
+                    
+                //         // вернуть предмет обратно в мир
+                //         item.width = this.oGameScene.tilesize;
+                //         item.height = this.oGameScene.tilesize;
+                    
+                //         item.x = this.oActor.sprite.x;
+                //         item.y = this.oActor.sprite.y;
+                //         item.lastPos.x = this.oActor.position.x;
+                //         item.lastPos.y = this.oActor.position.y;
+                    
+                //         item.events.destroy();
+                    
+                //         this.oGameScene.layers.items.add(item);
+                //         this.oGameScene.itemsMap[item.lastPos.x + "." + item.lastPos.y] = item;            
+                //     }
+                // }, this);
+
+                // item.events.onInputDown.add(function (item, pointer) {
+                //     if (pointer.rightButton.isDown) {
+                //         if (item.stack > 1) {
+                //             item.stack -= 1;
+                //             Helpers.find(item.children, "title", "stackText").setText(item.stack);
+                //             this.oGameScene.itemsManager.create(item.id, this.oActor.sprite, null);
+                //         } else {
+                //             item.kill();
+                //             item.slot.item = undefined;
+                //             this.oBackground.removeChild(item);
+                //             this.aItems.splice(this.aItems.indexOf(item), 1);
+                //             this.oGameScene.itemsManager.create(item.id, this.oActor.sprite, null);              
+                //         }
+                //     }
+                  
+                //     if (pointer.leftButton.isDown) {
+                //         if (this.oActiveItem && this.oActiveItem.reloading) { return };
+
+                //         item.slot.decor.visible = !item.slot.decor.visible;
+                    
+                //         if (item.slot.decor.visible) {
+                //             if (this.oActiveItem) {
+                //                 this.oActiveItem.rangeObject.visible = false;
+                //                 this.oActiveItem.slot.decor.visible = false;
+                //             }
+
+                //             item.slot.tint = 0x304876;
+                //             this.oActiveItem = item;
+                //             this.oActor.weapon = item;
+                //             this.oActor.weapon.rangeObject.visible = true;
+                //         } else {
+                //             this.oActiveItem = undefined;
+                            
+                //             this.oActor.weapon.rangeObject.visible = false;
+                //             this.oActor.weapon = undefined;
+                //         }
+                //     }
+                // }, this);
+            }
+        }
+    }
+
+    findSlotWithSameItem(item: Item) {
+        for(let i = 0; i < this.oBackground.slots.length; i++) {
+            let slot = this.oBackground.slots[i];
+
+            if(slot.item) {
+                if(slot.item.nId == item.nId && slot.item.nStack < slot.item.nMaxStack)
+                    return slot;
+            }
+        }
+      return false;
+    }
+
+    findFirstEmptySlot() {
+        for(var i = 0; i < this.oBackground.slots.length; i++) {
+            let slot = this.oBackground.slots[i];
+            if(slot.item == undefined && !slot.special) {
+                return slot;
+            }
+        }
+        return false;
+    }
+
+    findClosestSlotTo(sprite) {
+        let closestSlot, dist;
+        let lastDist = 50; 
+
+        this.oBackground.slots.forEach(function(slot) {
+            dist = this.oGameScene.game.math.distance(slot.x, slot.y, sprite.x, sprite.y);
+        
+            if(dist < lastDist) {
+                lastDist = dist;
+                closestSlot = slot;
+            }
+        }, this);
+
+        return closestSlot;
+    }
+}

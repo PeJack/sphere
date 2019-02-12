@@ -11,7 +11,7 @@ import { ActorsManager } from "../systems/actorsManager";
 import { ItemsManager } from "../systems/itemsManager";
 import { InputHandler } from "../systems/InputHandler";
 import Helpers from "../helpers";
-// import Inventory from "../components/inventory";
+import Inventory from "../components/inventory";
 
 interface ILayers {
     effects   : Phaser.GameObjects.Group,
@@ -43,7 +43,7 @@ export class GameScene extends Phaser.Scene {
     public oButtonHandler   : ButtonHandler;
     public oInputHandler    : InputHandler;
     public oEffectsManager  : EffectsManager;
-    // public oInventory       : Inventory;
+    public oInventory       : Inventory;
 
     constructor() {
         super({
@@ -94,14 +94,13 @@ export class GameScene extends Phaser.Scene {
         }
 
         this.oPlayer = this.oActorsManager.create(0);
-
         for (let i = 1; i < 10; i++) {
             this.oActorsManager.create(Helpers.random(1,2));
         }
 
 
-        // this.oInventory = new Inventory(this, this.oPlayer);
-        // this.oPlayer.oInventory = this.oInventory;
+        this.oInventory = new Inventory(this, this.oPlayer);
+        this.oPlayer.oInventory = this.oInventory;
 
         this.cameras.main.setBounds(0, 0, this.oMapsManager.nCols * this.nTileSize, this.oMapsManager.nRows * this.nTileSize);        
         this.cameras.main.startFollow(this.oPlayer.oSprite);
@@ -116,11 +115,19 @@ export class GameScene extends Phaser.Scene {
             this.oMapsManager.oMap.computeLight();
         }
 
+        this.oLayers.items.getChildren().forEach((item: Item) => {
+            if (this.checkOverlap(this.oPlayer.oSprite, item)) {
+                this.oPlayer.pickUp(item);
+            }
+        }, this);
+
         this.aActorsList.forEach((actor: Actor) => {
             if (actor.constructor.name == "Enemy") {
-                actor.aiAct()
+                actor.aiAct();
             }
         })
+
+        this.oPlayer.oInventory.update();
 
         if (this.oPlayer.oWeapon) {
             this.oPlayer.oWeapon.update();
@@ -141,5 +148,12 @@ export class GameScene extends Phaser.Scene {
             worldX: (obj.worldX - this.nTileSize / 2) / this.nTileSize,
             worldY: (obj.worldY - this.nTileSize / 2) / this.nTileSize
       }
-    }  
+    }
+
+    checkOverlap(objA, objB): boolean  {
+        let boundsA = objA.getBounds();
+        let boundsB = objB.getBounds();
+        
+        return !Phaser.Geom.Rectangle.Intersection(boundsA, boundsB).isEmpty();
+    }
 }

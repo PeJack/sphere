@@ -18,7 +18,7 @@ export class ItemsManager {
         this.aValidPos = [];
         for (let x = 0; x < this.oGameScene.oMapsManager.nCols; x++) {
             for (let y = 0; y < this.oGameScene.oMapsManager.nRows; y++) {
-                if (this.oGameScene.oMapsManager.oMap.oTiles[x][y]) {
+                if (!this.oGameScene.oMapsManager.oMap.oTiles[x][y]) {
                     this.aValidPos.push({x: x, y: y});
                 }
             }
@@ -27,7 +27,6 @@ export class ItemsManager {
     
     create(id: number, pos?: IPosition, actor?: Actor): Item {
         let i: IItem, data: IItem, item: Item;
-
         i = this.aList.find((el)=> {
             if (el[0] === id) {
                 return true;
@@ -50,7 +49,7 @@ export class ItemsManager {
             }
 
             if (!pos) return;
-
+            
             item = new Item(this.oGameScene, data, pos, actor);
             item.oLastPos = {
                 x: _pos.x, y: _pos.y
