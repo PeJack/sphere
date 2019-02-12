@@ -12,9 +12,9 @@ class Item extends Phaser.GameObjects.Sprite {
     private oGameScene      : GameScene;
     public oActor           : Actor;
     private oGroup          : Phaser.GameObjects.Group;
-    private oRangeObject    : IRangeObject;
+    public oRangeObject     : IRangeObject;
     private oVisualTimer    : VisualTimer;
-    private bReloading      : boolean;
+    public bReloading       : boolean;
     private sSpriteName     : string;
     private sType           : string;
     private sAttackType     : string;
@@ -30,7 +30,9 @@ class Item extends Phaser.GameObjects.Sprite {
     public oSlot            : any;
     
     public oLastPos         : IPosition;
-    public bProcessAgain    : boolean;        
+    public bProcessAgain    : boolean;  
+    public oLevelText       : Phaser.GameObjects.Text;
+    public oStackText       : Phaser.GameObjects.Text;    
     
     constructor(gameScene : GameScene, aData : IItem, pos : IPosition, actor : Actor) {
         super(gameScene, pos.x, pos.y, aData[3], 0); 
@@ -51,7 +53,7 @@ class Item extends Phaser.GameObjects.Sprite {
         this.width          = this.oGameScene.nTileSize;
         this.height         = this.oGameScene.nTileSize;  
         this.nDamage        = aData[18];
-        this.nRange         =  5 * 100 // aData[39];
+        this.nRange         = aData[39];
         this.oRangeObject   = this.setRangeObject();
         this.nReloadTime    = aData[37];    
         this.fEffect        = this.setEffect();
@@ -60,7 +62,21 @@ class Item extends Phaser.GameObjects.Sprite {
             gameScene: this.oGameScene,
             key: "timer",
             seconds: this.nReloadTime
-        });   
+        });
+
+        if (this.nLevel) {
+            this.oLevelText     = this.oGameScene.add.text(
+                0, 0, Helpers.romanize(this.nLevel), 
+                {font: '8px Courier New', fill: '#ffffff'}
+            ).setActive(false).setVisible(false);
+        }
+
+        if (this.nMaxStack && this.nMaxStack > 1) {
+            this.oStackText     = this.oGameScene.add.text(
+                0, 0, "" + this.nStack,
+                {font: '8px Courier New', fill: '#ffffff'}
+            ).setActive(false).setVisible(false);
+        }
       
         const self = this;
         this.oVisualTimer.fOnComplete = function () {
@@ -266,6 +282,11 @@ class Item extends Phaser.GameObjects.Sprite {
 
             missleTween.play(false); 
         } 
+    }
+
+    switchProperties(value: boolean): void {
+        if (this.oLevelText) this.oLevelText.setVisible(value);
+        if (this.oStackText) this.oStackText.setVisible(value);
     }
 }
 

@@ -3,13 +3,6 @@ import { GameScene } from '../scenes/gameScene';
 import Actor from './actor';
 import Item from './item';
 
-
-//@ts-ignore
-interface IInventoryContainer extends Phaser.GameObjects.Container {
-    slots?      : IIinvetorySprite[],
-    items?      : IIinvetorySprite[]
-}
-
 interface IIinvetorySprite extends Phaser.GameObjects.Sprite {
     decor?      : Phaser.GameObjects.Sprite,
     special?    : boolean,
@@ -22,7 +15,7 @@ export default class Inventory {
     private oGameScene              : GameScene;
     private oActor                  : Actor;
     private oGroup                  : Phaser.GameObjects.Group;
-    private oActiveItem             : Phaser.GameObjects.Group;
+    private oActiveItem             : Item;
     private aPending                : Item[];
     private aItems                  : Item[];
     private nSlots                  : number;
@@ -42,9 +35,9 @@ export default class Inventory {
     this.oActor     = actor;
     this.oGroup     = this.oGameScene.oLayers.hud;
     
-    this.aPending = [];
-    this.aItems   = [];
-    this.nSlots   = 15;
+    this.aPending   = [];
+    this.aItems     = [];
+    this.nSlots     = 15;
 
     this.nPadding   = 2;
     this.nIconSize  = 35;
@@ -65,7 +58,7 @@ export default class Inventory {
       this.nPadding;
     
 
-    this.oInventoryContainer    = this.oGameScene.add.container(window.innerWidth - (this.nWidth + 90) / 2, 30);
+    this.oInventoryContainer = this.oGameScene.add.container(window.innerWidth - (this.nWidth + 90) / 2, 30);
     this.oInventoryContainer.setScrollFactor(0, 0);
 
     this.oHeader = this.oGroup.create(0, 0, "inventory", "1.png");
@@ -99,16 +92,19 @@ export default class Inventory {
 
     this.oInventoryContainer.on("drag", (pointer: any, dragX: number, dragY: number) => {
         this.oInventoryContainer.setPosition(dragX, dragY);
-
     }, this);
 
 
     let count = 0;
-    const decorGraphics  = this.oGameScene.textures.createCanvas("decorGraphics", this.nIconSize, this.nIconSize);
-    decorGraphics.context.fillStyle = 'rgba(68, 131, 65, 1)';
-    decorGraphics.context.fillRect(0, 0, this.nIconSize, this.nIconSize);
+    const decorGraphics  = this.oGameScene.make.graphics({x: 0, y: 0, add: false});
+    decorGraphics.fillStyle(0x448341, 1);
+    decorGraphics.fillRect(0, 0, this.nIconSize, this.nIconSize);
+    decorGraphics.generateTexture("decorGraphics", this.nIconSize, this.nIconSize);
 
-    let decor: IIinvetorySprite, slot: IIinvetorySprite, ic_hand: IIinvetorySprite;
+    let decor: IIinvetorySprite;
+    let slot: IIinvetorySprite;
+    let decorContainer: Phaser.GameObjects.Container;
+
     for (let y = this.nPadding + 5; y < this.nHeight; y += this.nIconSize + this.nPadding) {
         for (let x = this.nPadding; x < this.nWidth; x += this.nIconSize + this.nPadding) {
             if (count < this.nSlots) {
@@ -122,15 +118,12 @@ export default class Inventory {
 
                     this.oBackgroundContainer.add(decor);
                 } else {            
-                    const decorContainer: Phaser.GameObjects.Container = this.oGameScene.add.container(0, 0);
-                    decor = this.oGameScene.add.sprite(x - this.nWidth / 2, y, "decorGraphics");
-                    ic_hand = this.oGameScene.add.sprite(3, 3, "ic_hand");
-                    decorContainer.add(decor);
-                    decorContainer.add(ic_hand);
+                    // decorContainer.add(this.oGameScene.add.sprite(x - this.nWidth / 2 - 8, y - 8, "ic_hand"));
+                    // decorContainer.add(this.oGameScene.add.sprite(x- this.nWidth / 2, y, "decorGraphics"));
+                    decor = this.oGameScene.add.sprite(x - this.nWidth / 2 - 8, y - 8, "ic_hand");
+                    decor.visible = false;
 
-                    ic_hand.visible = false;
-
-                    this.oBackgroundContainer.add(decorContainer);
+                    this.oBackgroundContainer.add(decor);
                 }
 
                 const i = count < 5 ? 15 : 16;
@@ -170,7 +163,6 @@ export default class Inventory {
     open(): void {
         this.oBackgroundContainer.visible = !this.oBackgroundContainer.visible;
         this.oFakeBg.visible = !this.oFakeBg.visible;
-        // this.oInventoryContainer.visible = !this.oInventoryContainer.visible
     }
 
     addItem(item: Item): void {
@@ -178,19 +170,13 @@ export default class Inventory {
     }
 
     processItem(item: Item): void {
-        let stackSlot = this.findSlotWithSameItem(item);
+        const stackSlot = this.findSlotWithSameItem(item);
+        let levelText: Phaser.GameObjects.Text;
+
         this.oGameScene.oLayers.items.remove(item);
         delete this.oGameScene.oItemsMap[item.oLastPos.x + "." + item.oLastPos.y];
-    
+        
         item.alpha = 1;
-
-        // if (!Helpers.find(item.children, "title", "levelText") && item.nLevel) {
-        //     let levelText = this.oGameScene.add.text(0, 0, Helpers.romanize(item.nLevel), {font: '8px Courier New', fill: '#ffffff'});
-        //     levelText.text = "levelText";
-        //     item.addChild(levelText);
-   
-        //     levelText.y = item.getBounds().height - 10;      
-        // }
 
         if (item.nMaxStack && stackSlot) {
             if ((stackSlot.item.nStack + item.nStack) > stackSlot.item.nMaxStack) {
@@ -202,19 +188,8 @@ export default class Inventory {
                 stackSlot.item.nStack += item.nStack;
             }
 
-            // обновление текста стака или его создание
-            // if (Helpers.find(stackSlot.item.children, "title", "stackText")) {
-            //     let stackText = Helpers.find(stackSlot.item.children, "title", "stackText");
-            //     stackText.setText(stackSlot.item.stack);
-            //     stackText.x = stackSlot.item.getLocalBounds().width - stackText.width - 5; 
-            //     stackText.y = 3;
-            // } else {
-            //     let stackText = this.oGameScene.add.text(0, 0, stackSlot.item.stack, {font: '9px Courier New', fill: '#ffffff'});
-            //     stackText.text = "stackText";
-            //     stackSlot.item.addChild(stackText); 
-            //     stackText.x = stackSlot.item.getLocalBounds().width - stackText.width - 5;  
-            //     stackText.y = 3;     
-            // }
+            // обновление текста стака
+            stackSlot.item.oStackText.setText("" + stackSlot.item.nStack);
 
             if (item.bProcessAgain) {
                 return this.processItem(item);
@@ -222,9 +197,8 @@ export default class Inventory {
 
             item.destroy();
             this.oGroup.remove(item)
-            // removeChild(item);
         } else {
-            let emptySlot = this.findFirstEmptySlot();
+            const emptySlot = this.findFirstEmptySlot();
 
             if (emptySlot) {
                 item.x = emptySlot.x;
@@ -232,31 +206,96 @@ export default class Inventory {
                 item.width = this.nIconSize;
                 item.height = this.nIconSize;
 
-                item.setInteractive();
-                this.oGameScene.input.setDraggable(item);
-
-                this.oBackgroundContainer.add(item);
                 emptySlot.item = item;
                 item.oSlot = emptySlot;
                 item.oActor = this.oActor;
 
-                // if (Helpers.find(emptySlot.item.children, "title", "stackText")) {
-                //   let stackText = Helpers.find(emptySlot.item.children, "title", "stackText");
-                //   stackText.setText(emptySlot.item.stack);
-                //   stackText.x = emptySlot.item.getLocalBounds().width - stackText.width - 5;
-                //   stackText.y = 3; 
-                // }
-
                 this.aItems.push(item);
+                this.oBackgroundContainer.add(item);
+
+                if (item.oLevelText) {
+                    item.oLevelText.x = (emptySlot.x - emptySlot.width / 2) + 3;
+                    item.oLevelText.y = emptySlot.y + 7;
+                    this.oBackgroundContainer.add(item.oLevelText);
+                }
+
+                if (item.oStackText) {
+                    item.oStackText.x = (emptySlot.x + emptySlot.width / 2) - item.oStackText.width - 3;
+                    item.oStackText.y = emptySlot.y - 16;                    
+                    this.oBackgroundContainer.add(item.oStackText);
+                }
+
+                item.switchProperties(true);
+
+                item.setScrollFactor(0, 0);
+                item.setInteractive(
+                    new Phaser.Geom.Rectangle(0, 0, item.width, item.height), 
+                    Phaser.Geom.Rectangle.Contains
+                );
+                this.oGameScene.input.setDraggable(item);               
+                
+                item.on("pointerdown", (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Event) => {
+                    if (pointer.leftButtonDown) {
+                        if (this.oActiveItem && this.oActiveItem.bReloading) { return };
+        
+                        item.oSlot.decor.visible = !item.oSlot.decor.visible;
+
+                        if (item.oSlot.decor.visible) {
+                            if (this.oActiveItem) {
+                                this.oActiveItem.oRangeObject.visible = false;
+                                this.oActiveItem.oSlot.decor.visible = false;
+                            }
+        
+                            item.oSlot.tint = 0x304876;
+                            this.oActiveItem = item;
+                            this.oActor.oWeapon = item;
+                            this.oActor.oWeapon.oRangeObject.visible = true;
+                        } else {
+                            this.oActiveItem = undefined;
+                            item.oSlot.tint = 0x736861;
+
+                            this.oActor.oWeapon.oRangeObject.visible = false;
+                            this.oActor.oWeapon = undefined;
+                        }
+                    }  
+                })
+                    
+                // let heldItemSlot: IIinvetorySprite;
+                // item.on("dragstart", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+                //     item.setPosition(pointer.worldX, pointer.worldY);
+                //     heldItemSlot = item.oSlot;
+                // }, this);
+
+                // item.on("dragend", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number, dropped: boolean) => {
+                //     // this.oBackgroundContainer.add(item);
+                    
+                //     // const closestSlot = this.findClosestSlotTo(item);
+                    
+                //     // if (closestSlot) {
+
+                //     //     if (closestSlot.item != undefined) {
+                //     //         const closestItem = closestSlot.item;
+
+                //     //         closestItem.x = heldItemSlot.x;
+                //     //         closestItem.y = heldItemSlot.y;
+
+                //     //         closestItem.slot = heldItemSlot;
+                //     //         heldItemSlot  = closestSlot;
+                //     //         closestSlot.item = item;
+                //     //         heldItemSlot.item = closestItem;                            
+                //     //     } else {
+    
+                //     //         item.oSlot = closestSlot;
+                //     //         closestSlot.item = item;
+
+                //     //         heldItemSlot.item = undefined;
+                //     //     }
+                //     // }
+
+                // }, this);
 
                 // let heldItemSlot;
 
-                // item.events.onDragStart.add(function (heldItem, pointer) {
-                //     this.oBackground.removeChild(heldItem);
-                //     this.oBackground.addChild(heldItem);
-
-                //     heldItemSlot = heldItem.slot;
-                // }, this);
 
                 // item.events.onDragStop.add(function (heldItem, pointer) {
                 //     let closestSlot = this.findClosestSlotTo(heldItem);
@@ -352,11 +391,12 @@ export default class Inventory {
 
     findSlotWithSameItem(item: Item) {
         for(let i = 0; i < this.oBackground.slots.length; i++) {
-            let slot = this.oBackground.slots[i];
+            const slot = this.oBackground.slots[i];
 
             if(slot.item) {
-                if(slot.item.nId == item.nId && slot.item.nStack < slot.item.nMaxStack)
+                if(slot.item.nId == item.nId && slot.item.nStack < slot.item.nMaxStack) {
                     return slot;
+                }
             }
         }
       return false;
@@ -375,13 +415,14 @@ export default class Inventory {
     findClosestSlotTo(sprite) {
         let closestSlot, dist;
         let lastDist = 50; 
-
         this.oBackground.slots.forEach(function(slot) {
-            dist = this.oGameScene.game.math.distance(slot.x, slot.y, sprite.x, sprite.y);
+            if (slot != sprite.slot && !slot.special) {
+                dist = Phaser.Math.Distance.Between(slot.x, slot.y, sprite.x, sprite.y);
         
-            if(dist < lastDist) {
-                lastDist = dist;
-                closestSlot = slot;
+                if(dist < lastDist) {
+                    lastDist = dist;
+                    closestSlot = slot;
+                }
             }
         }, this);
 
