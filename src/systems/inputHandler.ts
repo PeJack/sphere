@@ -42,22 +42,36 @@ export class InputHandler {
 
     handleInputButton(): void {
         if (this.oButtonHandler.update() && this.sAction != "waiting" && this.bActive) {
-            
-            if (this.oDownButtons.UP) {
-                this.startWalk(
-                    [{y: this.oGameScene.oPlayer.getPosition().y - 1}],
-                    "up"
-                )
+            const path: IPath = {};
+            let direction: string;
 
-                this.oButtonHandler.timeOut();                
+            if (this.oDownButtons.UP) {
+                path.y = this.oGameScene.oPlayer.getPosition().y - 1;
+                direction = "up";
+
+                if (this.oDownButtons.RIGHT) {
+                    path.x = this.oGameScene.oPlayer.getPosition().x + 1;
+                } else if (this.oDownButtons.LEFT) {
+                    path.x = this.oGameScene.oPlayer.getPosition().x - 1;
+                }
+                
+                this.startWalk([path], direction);
+                this.oButtonHandler.timeOut();           
             }
 
             if (this.oDownButtons.DOWN) {
-                this.startWalk(
-                    [{y: this.oGameScene.oPlayer.getPosition().y + 1}],
-                    "down"
-                )
+                path.y = this.oGameScene.oPlayer.getPosition().y + 1;
+                direction = "down";
 
+                if (this.oDownButtons.RIGHT) {
+                    path.x = this.oGameScene.oPlayer.getPosition().x + 1;
+                    direction = "right";
+                } else if (this.oDownButtons.LEFT) {
+                    path.x = this.oGameScene.oPlayer.getPosition().x - 1;
+                    direction = "left";
+                }
+
+                this.startWalk([path], direction);
                 this.oButtonHandler.timeOut();                
             }
 
@@ -83,10 +97,6 @@ export class InputHandler {
 
     handleInputTap(pointer: Phaser.Input.Pointer): void {
         // for(const item of this.oGameScene.oInventory.aItems) {
-        //     if (item.input.pointOver()) {
-        //         return;
-        //     }
-
         //     this.attack();
         // }
     }

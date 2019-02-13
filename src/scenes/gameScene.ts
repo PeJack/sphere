@@ -90,13 +90,13 @@ export class GameScene extends Phaser.Scene {
         this.oInputHandler.start();
 
         for (let i = 0; i < 50; i++) {
-            this.oItemsManager.create(201);
+            this.oItemsManager.create(Helpers.random(201, 212));
         }
 
         this.oPlayer = this.oActorsManager.create(0);
-        for (let i = 1; i < 10; i++) {
-            this.oActorsManager.create(Helpers.random(1,2));
-        }
+        // for (let i = 1; i < 10; i++) {
+        //     this.oActorsManager.create(Helpers.random(1,2));
+        // }
 
 
         this.oInventory = new Inventory(this, this.oPlayer);
@@ -104,6 +104,8 @@ export class GameScene extends Phaser.Scene {
 
         this.cameras.main.setBounds(0, 0, this.oMapsManager.nCols * this.nTileSize, this.oMapsManager.nRows * this.nTileSize);        
         this.cameras.main.startFollow(this.oPlayer.oSprite);
+        this.cameras.main.roundPixels = true;
+
         this.oMapsManager.oMap.light();
     }
 

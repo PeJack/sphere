@@ -4,11 +4,13 @@ import Actor from './actor';
 import Item from './item';
 
 interface IIinvetorySprite extends Phaser.GameObjects.Sprite {
-    decor?      : Phaser.GameObjects.Sprite,
-    special?    : boolean,
-    item?       : Item,
-    slots?      : IIinvetorySprite[],
-    items?      : Item[]
+    id?             : number,
+    decor?          : Phaser.GameObjects.Sprite,
+    decorGraphics?  : Phaser.GameObjects.Sprite,
+    special?        : boolean,
+    item?           : Item,
+    slots?          : IIinvetorySprite[],
+    items?          : Item[]
 }
 
 export default class Inventory {
@@ -17,7 +19,7 @@ export default class Inventory {
     private oGroup                  : Phaser.GameObjects.Group;
     private oActiveItem             : Item;
     private aPending                : Item[];
-    private aItems                  : Item[];
+    public aItems                   : Item[];
     private nSlots                  : number;
     private nPadding                : number;
     private nIconSize               : number;
@@ -28,7 +30,7 @@ export default class Inventory {
     private oBackground             : IIinvetorySprite;
     private oFakeBg                 : IIinvetorySprite;
     private oInventoryContainer     : Phaser.GameObjects.Container;
-    private oBackgroundContainer    : Phaser.GameObjects.Container;        
+    private oBackgroundContainer    : Phaser.GameObjects.Container;     
 
   constructor(gameScene : GameScene, actor : Actor) {
     this.oGameScene = gameScene;
@@ -98,7 +100,7 @@ export default class Inventory {
     let count = 0;
     const decorGraphics  = this.oGameScene.make.graphics({x: 0, y: 0, add: false});
     decorGraphics.fillStyle(0x448341, 1);
-    decorGraphics.fillRect(0, 0, this.nIconSize, this.nIconSize);
+    decorGraphics.fillRect(0, 0, this.nIconSize - 1, this.nIconSize);
     decorGraphics.generateTexture("decorGraphics", this.nIconSize, this.nIconSize);
 
     let decor: IIinvetorySprite;
@@ -116,23 +118,34 @@ export default class Inventory {
                     decor.displayWidth = this.nIconSize;
                     decor.displayHeight = this.nIconSize - 3;
 
-                    this.oBackgroundContainer.add(decor);
+                    // this.oBackgroundContainer.add(decor);
                 } else {            
                     // decorContainer.add(this.oGameScene.add.sprite(x - this.nWidth / 2 - 8, y - 8, "ic_hand"));
                     // decorContainer.add(this.oGameScene.add.sprite(x- this.nWidth / 2, y, "decorGraphics"));
                     decor = this.oGameScene.add.sprite(x - this.nWidth / 2 - 8, y - 8, "ic_hand");
                     decor.visible = false;
 
-                    this.oBackgroundContainer.add(decor);
+                    // this.oBackgroundContainer.add(decor);
                 }
 
                 const i = count < 5 ? 15 : 16;
                 slot = this.oGameScene.add.sprite(x - this.nWidth / 2, y, "inventory", i + ".png");
-                
+                slot.id = count + 1;
                 slot.displayWidth = this.nIconSize;
                 slot.displayHeight = this.nIconSize;
                 slot.special = count < 5;
+
+                if (!slot.special) {
+                    const decorGraphicsSprite = this.oGameScene.add.sprite(x - this.nWidth / 2 + 1, y, "decorGraphics");
+                    decorGraphicsSprite.visible = false;
+
+                    this.oBackgroundContainer.add(decorGraphicsSprite)
+                    slot.decorGraphics = decorGraphicsSprite;
+                }
+
+                this.oBackgroundContainer.add(decor);
                 slot.decor = decor;
+                
                 slot.tint = 0x736861;
 
                 this.oBackgroundContainer.add(slot);
@@ -171,14 +184,13 @@ export default class Inventory {
 
     processItem(item: Item): void {
         const stackSlot = this.findSlotWithSameItem(item);
-        let levelText: Phaser.GameObjects.Text;
-
-        this.oGameScene.oLayers.items.remove(item);
-        delete this.oGameScene.oItemsMap[item.oLastPos.x + "." + item.oLastPos.y];
         
         item.alpha = 1;
 
         if (item.nMaxStack && stackSlot) {
+            this.oGameScene.oLayers.items.remove(item);
+            delete this.oGameScene.oItemsMap[item.oLastPos.x + "." + item.oLastPos.y];
+
             if ((stackSlot.item.nStack + item.nStack) > stackSlot.item.nMaxStack) {
                 let diff = (stackSlot.item.nStack + item.nStack) - stackSlot.item.nMaxStack;
                 stackSlot.item.nStack += (item.nStack - diff);
@@ -201,6 +213,9 @@ export default class Inventory {
             const emptySlot = this.findFirstEmptySlot();
 
             if (emptySlot) {
+                this.oGameScene.oLayers.items.remove(item);
+                delete this.oGameScene.oItemsMap[item.oLastPos.x + "." + item.oLastPos.y];
+                
                 item.x = emptySlot.x;
                 item.y = emptySlot.y;
                 item.width = this.nIconSize;
@@ -232,18 +247,18 @@ export default class Inventory {
                     new Phaser.Geom.Rectangle(0, 0, item.width, item.height), 
                     Phaser.Geom.Rectangle.Contains
                 );
-                this.oGameScene.input.setDraggable(item);               
+                this.oGameScene.input.setDraggable(item);
                 
-                item.on("pointerdown", (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Event) => {
-                    if (pointer.leftButtonDown) {
+                item.on("pointerup", (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Event) => {
+                    if (pointer.leftButtonDown && item.oSlot) {
                         if (this.oActiveItem && this.oActiveItem.bReloading) { return };
-        
+
+                        item.oSlot.decorGraphics.visible = !item.oSlot.decorGraphics.visible;
                         item.oSlot.decor.visible = !item.oSlot.decor.visible;
 
                         if (item.oSlot.decor.visible) {
                             if (this.oActiveItem) {
-                                this.oActiveItem.oRangeObject.visible = false;
-                                this.oActiveItem.oSlot.decor.visible = false;
+                                this.disableActiveItem();
                             }
         
                             item.oSlot.tint = 0x304876;
@@ -251,140 +266,83 @@ export default class Inventory {
                             this.oActor.oWeapon = item;
                             this.oActor.oWeapon.oRangeObject.visible = true;
                         } else {
-                            this.oActiveItem = undefined;
-                            item.oSlot.tint = 0x736861;
+                            if (this.oActiveItem) {
+                                this.disableActiveItem();
+                            }
 
                             this.oActor.oWeapon.oRangeObject.visible = false;
                             this.oActor.oWeapon = undefined;
                         }
                     }  
-                })
-                    
-                // let heldItemSlot: IIinvetorySprite;
-                // item.on("dragstart", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-                //     item.setPosition(pointer.worldX, pointer.worldY);
-                //     heldItemSlot = item.oSlot;
-                // }, this);
+                }, this);
 
-                // item.on("dragend", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number, dropped: boolean) => {
-                //     // this.oBackgroundContainer.add(item);
-                    
-                //     // const closestSlot = this.findClosestSlotTo(item);
-                    
-                //     // if (closestSlot) {
+                let heldItemSlot: IIinvetorySprite;
+                item.on("drag", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+                    item.setPosition(dragX, dragY);
+                    heldItemSlot = item.oSlot;
+                }, this);
 
-                //     //     if (closestSlot.item != undefined) {
-                //     //         const closestItem = closestSlot.item;
+                item.on("dragend", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number, dropped: boolean) => {
+                    if (heldItemSlot) {
+                        const closestSlot = this.findClosestSlotTo(item);
 
-                //     //         closestItem.x = heldItemSlot.x;
-                //     //         closestItem.y = heldItemSlot.y;
+                        if (closestSlot) {
+                            if (item == this.oActiveItem) {
+                                this.disableActiveItem();
+                            }
 
-                //     //         closestItem.slot = heldItemSlot;
-                //     //         heldItemSlot  = closestSlot;
-                //     //         closestSlot.item = item;
-                //     //         heldItemSlot.item = closestItem;                            
-                //     //     } else {
+                            if (closestSlot.item != undefined) {
+                                const closestItem = closestSlot.item;
     
-                //     //         item.oSlot = closestSlot;
-                //     //         closestSlot.item = item;
+                                closestItem.x = heldItemSlot.x;
+                                closestItem.y = heldItemSlot.y;
+                                closestItem.oSlot = heldItemSlot;
+                                heldItemSlot.item = closestItem;
 
-                //     //         heldItemSlot.item = undefined;
-                //     //     }
-                //     // }
-
-                // }, this);
-
-                // let heldItemSlot;
-
-
-                // item.events.onDragStop.add(function (heldItem, pointer) {
-                //     let closestSlot = this.findClosestSlotTo(heldItem);
-
-                //     if (closestSlot) {
-                //         // ближайший слот содержит предмет
-                //         if (closestSlot.item != undefined) {
-                //             let closestItem = closestSlot.item;
-
-                //             // поменять предметы местами
-                //             closestItem.x = heldItemSlot.x;
-                //             closestItem.y = heldItemSlot.y;
-
-                //             closestItem.slot = heldItemSlot;
-                //             heldItem.slot = closestSlot;
-
-                //             closestSlot.item = heldItem;
-                //             heldItemSlot.item = closestItem;
-                //         } else { // если слот пустой
-                //             heldItem.slot = closestSlot;
-                //             closestSlot.item = heldItem;
-
-                //             heldItemSlot.item = null;
-
-                //         }
-                  
-                //         // переместить предмет в ближайший слот
-                //         heldItem.x = closestSlot.x;
-                //         heldItem.y = closestSlot.y;
-
-                //     } else { // выбросить предмет
-                //         item.slot.item = undefined;
-                //         this.oBackground.removeChild(item);
-                //         this.aItems.splice(this.aItems.indexOf(item), 1);
-                    
-                //         // вернуть предмет обратно в мир
-                //         item.width = this.oGameScene.tilesize;
-                //         item.height = this.oGameScene.tilesize;
-                    
-                //         item.x = this.oActor.sprite.x;
-                //         item.y = this.oActor.sprite.y;
-                //         item.lastPos.x = this.oActor.position.x;
-                //         item.lastPos.y = this.oActor.position.y;
-                    
-                //         item.events.destroy();
-                    
-                //         this.oGameScene.layers.items.add(item);
-                //         this.oGameScene.itemsMap[item.lastPos.x + "." + item.lastPos.y] = item;            
-                //     }
-                // }, this);
-
-                // item.events.onInputDown.add(function (item, pointer) {
-                //     if (pointer.rightButton.isDown) {
-                //         if (item.stack > 1) {
-                //             item.stack -= 1;
-                //             Helpers.find(item.children, "title", "stackText").setText(item.stack);
-                //             this.oGameScene.itemsManager.create(item.id, this.oActor.sprite, null);
-                //         } else {
-                //             item.kill();
-                //             item.slot.item = undefined;
-                //             this.oBackground.removeChild(item);
-                //             this.aItems.splice(this.aItems.indexOf(item), 1);
-                //             this.oGameScene.itemsManager.create(item.id, this.oActor.sprite, null);              
-                //         }
-                //     }
-                  
-                //     if (pointer.leftButton.isDown) {
-                //         if (this.oActiveItem && this.oActiveItem.reloading) { return };
-
-                //         item.slot.decor.visible = !item.slot.decor.visible;
-                    
-                //         if (item.slot.decor.visible) {
-                //             if (this.oActiveItem) {
-                //                 this.oActiveItem.rangeObject.visible = false;
-                //                 this.oActiveItem.slot.decor.visible = false;
-                //             }
-
-                //             item.slot.tint = 0x304876;
-                //             this.oActiveItem = item;
-                //             this.oActor.weapon = item;
-                //             this.oActor.weapon.rangeObject.visible = true;
-                //         } else {
-                //             this.oActiveItem = undefined;
+                                item.oSlot = closestSlot;
+                                closestSlot.item = item;
+                            } else {
+                                item.oSlot = closestSlot;
+                                closestSlot.item = item;
+    
+                                heldItemSlot.item = undefined;
+                            }
+    
+                            item.x = closestSlot.x;
+                            item.y = closestSlot.y;
+                        } else {
+                            item.oSlot.item = undefined;
                             
-                //             this.oActor.weapon.rangeObject.visible = false;
-                //             this.oActor.weapon = undefined;
-                //         }
-                //     }
-                // }, this);
+                            this.disableDecor(item.oSlot);
+                            if (item == this.oActiveItem) {
+                                this.disableActiveItem();
+                            }
+
+                            item.oSlot = undefined;
+
+                            this.oBackgroundContainer.remove(item);
+                            this.aItems.splice(this.aItems.indexOf(item), 1);
+    
+                            item.width = this.oGameScene.nTileSize;
+                            item.height = this.oGameScene.nTileSize;
+    
+                            item.x = this.oActor.oSprite.x;
+                            item.y = this.oActor.oSprite.y - this.oGameScene.nTileSize;
+                            item.oLastPos.x = this.oActor.oPosition.x;
+                            item.oLastPos.y = this.oActor.oPosition.y - 1;
+
+                            item.switchProperties(false);
+                            item.removeAllListeners();                            
+                            item.removeInteractive();
+                            item.setScrollFactor(1, 1);
+
+                            this.oGameScene.oLayers.items.add(item, true);
+                            this.oGameScene.oItemsMap[item.oLastPos.x + "." + item.oLastPos.y] = item;
+                        }
+                    }
+
+                    heldItemSlot = undefined;
+                }, this);
             }
         }
     }
@@ -412,20 +370,35 @@ export default class Inventory {
         return false;
     }
 
-    findClosestSlotTo(sprite) {
-        let closestSlot, dist;
+    findClosestSlotTo(slot: IIinvetorySprite) {
+        let closestSlot: IIinvetorySprite, dist: number;
         let lastDist = 50; 
-        this.oBackground.slots.forEach(function(slot) {
-            if (slot != sprite.slot && !slot.special) {
-                dist = Phaser.Math.Distance.Between(slot.x, slot.y, sprite.x, sprite.y);
-        
+        this.oBackground.slots.forEach(function(_slot) {
+            if (!_slot.special) {
+                dist = Phaser.Math.Distance.Between(slot.x, slot.y, _slot.x, _slot.y);
+                
                 if(dist < lastDist) {
                     lastDist = dist;
-                    closestSlot = slot;
+                    closestSlot = _slot;
                 }
             }
         }, this);
 
         return closestSlot;
+    }
+
+    disableActiveItem(): void {
+        this.oActiveItem.oRangeObject.visible = false;
+        this.oActiveItem.oSlot.decor.visible = false;
+        this.oActiveItem.oSlot.decorGraphics.visible = false;
+        this.oActiveItem.oSlot.tint = 0x736861;  
+        
+        this.oActiveItem = undefined;
+    }
+
+    disableDecor(slot: IIinvetorySprite): void {
+        slot.decor.visible = false;
+        slot.decorGraphics.visible = false;
+        slot.tint = 0x736861;
     }
 }
