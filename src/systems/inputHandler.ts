@@ -1,18 +1,20 @@
 import { GameScene } from "../scenes/gameScene";
-import { ButtonHandler, IDownButtons } from "./buttonHandler";
+import { ButtonHandler, IDownButtons, IUpButtons } from "./buttonHandler";
 import { IPath } from "../interfaces";
+import Item from "../components/item";
 
 interface IClickPosition {
     x: number, y: number
 }
 
 export class InputHandler {
-    private oGameScene     : GameScene;
-    private oClickPosition : IClickPosition;
-    private oButtonHandler : ButtonHandler;
-    private oDownButtons   : IDownButtons;
-    private bActive        : boolean;
-    private sAction        : string; 
+    private oGameScene      : GameScene;
+    private oClickPosition  : IClickPosition;
+    private oButtonHandler  : ButtonHandler;
+    private oDownButtons    : IDownButtons;
+    private oUpButtons      : IUpButtons;
+    private bActive         : boolean;
+    private sAction         : string; 
 
     constructor(gameScene: GameScene) {
         this.oGameScene     = gameScene;
@@ -27,6 +29,7 @@ export class InputHandler {
         this.oGameScene.input.enabled = true;
         this.oButtonHandler = this.oGameScene.oButtonHandler;
         this.oDownButtons   = this.oButtonHandler.oDownButtons;
+        this.oUpButtons     = this.oButtonHandler.oUpButtons;
         this.bActive        = false;
     }
 
@@ -44,6 +47,54 @@ export class InputHandler {
         if (this.oButtonHandler.update() && this.sAction != "waiting" && this.bActive) {
             const path: IPath = {};
             let direction: string;
+
+            if (this.oUpButtons.ONE && this.oGameScene.oPlayer.oInventory.aItems[0]) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.aItems[0]);
+            }
+
+            if (this.oUpButtons.TWO && this.oGameScene.oPlayer.oInventory.aItems[1]) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.aItems[1]);
+            }
+
+            if (this.oUpButtons.THREE && this.oGameScene.oPlayer.oInventory.aItems[2]) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.aItems[2]);
+            }
+            
+            if (this.oUpButtons.FOUR && this.oGameScene.oPlayer.oInventory.aItems[3]) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.aItems[3]);
+            } 
+            
+            if (this.oUpButtons.FIVE && this.oGameScene.oPlayer.oInventory.aItems[4]) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.aItems[4]);
+            }
+            
+            if (this.oUpButtons.SIX && this.oGameScene.oPlayer.oInventory.aItems[5]) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.aItems[5]);
+            }
+            
+            if (this.oUpButtons.SEVEN && this.oGameScene.oPlayer.oInventory.aItems[6]) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.aItems[6]);
+            }
+            
+            if (this.oUpButtons.EIGHT && this.oGameScene.oPlayer.oInventory.aItems[7]) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.aItems[7]);
+            }
+            
+            if (this.oUpButtons.NINE && this.oGameScene.oPlayer.oInventory.aItems[8]) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.aItems[8]);
+            }
+            
+            if (this.oUpButtons.ZERO && this.oGameScene.oPlayer.oInventory.aItems[9]) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.aItems[9]);
+            }
+            
+            if (this.oUpButtons.E || this.oDownButtons.E) {
+                this.oGameScene.oLayers.items.getChildren().forEach((item: Item) => {
+                    if (this.oGameScene.checkOverlap(this.oGameScene.oPlayer.oSprite, item)) {
+                        this.oGameScene.oPlayer.pickUp(item);
+                    }
+                });
+            }
 
             if (this.oDownButtons.UP) {
                 path.y = this.oGameScene.oPlayer.getPosition().y - 1;
@@ -89,9 +140,10 @@ export class InputHandler {
                     [{x: this.oGameScene.oPlayer.getPosition().x + 1}],
                     "right"
                 )
+                this.oButtonHandler.timeOut();           
+            }
 
-                this.oButtonHandler.timeOut();                 
-            }             
+            this.oButtonHandler.timeOut();            
         }
     }
 

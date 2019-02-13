@@ -215,7 +215,7 @@ export default class Inventory {
             if (emptySlot) {
                 this.oGameScene.oLayers.items.remove(item);
                 delete this.oGameScene.oItemsMap[item.oLastPos.x + "." + item.oLastPos.y];
-                
+
                 item.x = emptySlot.x;
                 item.y = emptySlot.y;
                 item.width = this.nIconSize;
@@ -250,29 +250,8 @@ export default class Inventory {
                 this.oGameScene.input.setDraggable(item);
                 
                 item.on("pointerup", (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Event) => {
-                    if (pointer.leftButtonDown && item.oSlot) {
-                        if (this.oActiveItem && this.oActiveItem.bReloading) { return };
-
-                        item.oSlot.decorGraphics.visible = !item.oSlot.decorGraphics.visible;
-                        item.oSlot.decor.visible = !item.oSlot.decor.visible;
-
-                        if (item.oSlot.decor.visible) {
-                            if (this.oActiveItem) {
-                                this.disableActiveItem();
-                            }
-        
-                            item.oSlot.tint = 0x304876;
-                            this.oActiveItem = item;
-                            this.oActor.oWeapon = item;
-                            this.oActor.oWeapon.oRangeObject.visible = true;
-                        } else {
-                            if (this.oActiveItem) {
-                                this.disableActiveItem();
-                            }
-
-                            this.oActor.oWeapon.oRangeObject.visible = false;
-                            this.oActor.oWeapon = undefined;
-                        }
+                    if (pointer.leftButtonDown) {
+                        this.activateItem(item);
                     }  
                 }, this);
 
@@ -327,9 +306,9 @@ export default class Inventory {
                             item.height = this.oGameScene.nTileSize;
     
                             item.x = this.oActor.oSprite.x;
-                            item.y = this.oActor.oSprite.y - this.oGameScene.nTileSize;
+                            item.y = this.oActor.oSprite.y;
                             item.oLastPos.x = this.oActor.oPosition.x;
-                            item.oLastPos.y = this.oActor.oPosition.y - 1;
+                            item.oLastPos.y = this.oActor.oPosition.y;
 
                             item.switchProperties(false);
                             item.removeAllListeners();                            
@@ -400,5 +379,31 @@ export default class Inventory {
         slot.decor.visible = false;
         slot.decorGraphics.visible = false;
         slot.tint = 0x736861;
+    }
+
+    activateItem(item: Item): void {
+        if (!item.oSlot) { return };
+        if (this.oActiveItem && this.oActiveItem.bReloading) { return };
+
+        item.oSlot.decorGraphics.visible = !item.oSlot.decorGraphics.visible;
+        item.oSlot.decor.visible = !item.oSlot.decor.visible;
+
+        if (item.oSlot.decor.visible) {
+            if (this.oActiveItem) {
+                this.disableActiveItem();
+            }
+
+            item.oSlot.tint = 0x304876;
+            this.oActiveItem = item;
+            this.oActor.oWeapon = item;
+            this.oActor.oWeapon.oRangeObject.visible = true;
+        } else {
+            if (this.oActiveItem) {
+                this.disableActiveItem();
+            }
+
+            this.oActor.oWeapon.oRangeObject.visible = false;
+            this.oActor.oWeapon = undefined;
+        }
     }
 }

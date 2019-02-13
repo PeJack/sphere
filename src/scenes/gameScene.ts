@@ -94,9 +94,9 @@ export class GameScene extends Phaser.Scene {
         }
 
         this.oPlayer = this.oActorsManager.create(0);
-        // for (let i = 1; i < 10; i++) {
-        //     this.oActorsManager.create(Helpers.random(1,2));
-        // }
+        for (let i = 1; i < 10; i++) {
+            this.oActorsManager.create(Helpers.random(1,2));
+        }
 
 
         this.oInventory = new Inventory(this, this.oPlayer);
@@ -117,11 +117,13 @@ export class GameScene extends Phaser.Scene {
             this.oMapsManager.oMap.computeLight();
         }
 
-        this.oLayers.items.getChildren().forEach((item: Item) => {
-            if (this.checkOverlap(this.oPlayer.oSprite, item)) {
-                this.oPlayer.pickUp(item);
-            }
-        }, this);
+        // if (this.oPlayer.oDownButtons.E) {
+        //     this.oLayers.items.getChildren().forEach((item: Item) => {
+        //         if (this.checkOverlap(this.oPlayer.oSprite, item)) {
+        //             this.oPlayer.pickUp(item);
+        //         }
+        //     }, this);
+        // };
 
         this.aActorsList.forEach((actor: Actor) => {
             if (actor.constructor.name == "Enemy") {
