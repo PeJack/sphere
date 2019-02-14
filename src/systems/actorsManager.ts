@@ -13,7 +13,7 @@ export class ActorsManager {
     constructor(gameScene: GameScene) {
         this.oGameScene = gameScene;
         this.aList = [
-            {id: 1, dmg: 10, title: "Wizard", isPlayer: false}
+            {id: 1, dmg: 10, title: "Wizard", isPlayer: false, spriteOffset: 0}
         ];
     }
 
@@ -33,7 +33,7 @@ export class ActorsManager {
         let actor: Actor;
 
         if (id == 0) {
-            data = {id: id, isPlayer: true};
+            data = {id: id, isPlayer: true, spriteOffset: 140};
         } else {
             data = this.aList.find((e) => {
                 if (e[0] == id || e.id == id) {

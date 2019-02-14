@@ -10,8 +10,10 @@ import { EffectsManager } from "../systems/effectsManager";
 import { ActorsManager } from "../systems/actorsManager";
 import { ItemsManager } from "../systems/itemsManager";
 import { InputHandler } from "../systems/InputHandler";
+import { Pocket } from "../components/pocket";
+
 import Helpers from "../helpers";
-import Inventory from "../components/inventory";
+import { Bag } from "../components/bag";
 
 interface ILayers {
     effects   : Phaser.GameObjects.Group,
@@ -43,7 +45,8 @@ export class GameScene extends Phaser.Scene {
     public oButtonHandler   : ButtonHandler;
     public oInputHandler    : InputHandler;
     public oEffectsManager  : EffectsManager;
-    public oInventory       : Inventory;
+    public oPocket          : Pocket;
+    public oBag             : Bag;
 
     constructor() {
         super({
@@ -99,8 +102,10 @@ export class GameScene extends Phaser.Scene {
         }
 
 
-        this.oInventory = new Inventory(this, this.oPlayer);
-        this.oPlayer.oInventory = this.oInventory;
+        this.oPocket = new Pocket(this, this.oPlayer);
+        this.oPlayer.oPocket = this.oPocket;
+
+        this.oBag    = new Bag(this, this.oPlayer);
 
         this.cameras.main.setBounds(0, 0, this.oMapsManager.nCols * this.nTileSize, this.oMapsManager.nRows * this.nTileSize);        
         this.cameras.main.startFollow(this.oPlayer.oSprite);
@@ -117,21 +122,13 @@ export class GameScene extends Phaser.Scene {
             this.oMapsManager.oMap.computeLight();
         }
 
-        // if (this.oPlayer.oDownButtons.E) {
-        //     this.oLayers.items.getChildren().forEach((item: Item) => {
-        //         if (this.checkOverlap(this.oPlayer.oSprite, item)) {
-        //             this.oPlayer.pickUp(item);
-        //         }
-        //     }, this);
-        // };
-
         this.aActorsList.forEach((actor: Actor) => {
             if (actor.constructor.name == "Enemy") {
                 actor.aiAct();
             }
         })
 
-        this.oPlayer.oInventory.update();
+        this.oPlayer.oPocket.update();
 
         if (this.oPlayer.oWeapon) {
             this.oPlayer.oWeapon.update();

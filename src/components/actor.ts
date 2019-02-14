@@ -2,7 +2,8 @@ import { GameScene } from '../scenes/gameScene';
 import { IPath, IPosition } from '../interfaces';
 import Item from './item';
 import { ButtonHandler, IDownButtons } from '../systems/buttonHandler';
-import Inventory from './inventory';
+import { Pocket } from './pocket';
+import { Bag } from './bag';
 
 //@ts-ignore
 interface ISpriteAdd extends Phaser.GameObjects.Sprite {
@@ -26,6 +27,7 @@ export default class Actor {
     public nSpriteOffset        : number;
     public nMovingDelay         : number;
     public nLocalID             : number;
+    public nEntityID            : number;
     public bIsPlayer            : boolean; 
     public bVisibleForPlayer    : boolean;   
     public aPath                : IPath[];
@@ -35,7 +37,8 @@ export default class Actor {
     public nDamage              : number;
     public oButtonHandler       : ButtonHandler;
     public oDownButtons         : IDownButtons;
-    public oInventory           : Inventory;
+    public oPocket              : Pocket;
+    public oBag                 : Bag;
 
     private bWalking            : boolean;
     private sCurrDir            : string; 
@@ -79,50 +82,58 @@ export default class Actor {
     }
 
     setAnimations(): void {
-        this.oGameScene.anims.create({
-            key: "idle",
-            frames: this.oGameScene.anims.generateFrameNumbers(
-                "48bitSprites", {
-                    // @ts-ignore
-                    frames: [0 + this.nSpriteOffset, 1 + this.nSpriteOffset]
-                }),
-            repeat: -1,
-            frameRate: 6           
-        });
+        if (!this.oGameScene.anims.exists("idle_" + this.nEntityID)) {
+            this.oGameScene.anims.create({
+                key: "idle_" + this.nEntityID,
+                frames: this.oGameScene.anims.generateFrameNumbers(
+                    "48bitSprites", {
+                        // @ts-ignore
+                        frames: [0 + this.nSpriteOffset, 1 + this.nSpriteOffset]
+                    }),
+                repeat: -1,
+                frameRate: 6           
+            });
+        }
 
-        this.oGameScene.anims.create({
-            key: "walk",
-            frames: this.oGameScene.anims.generateFrameNumbers(
-                "48bitSprites", {
-                    // @ts-ignore
-                    frames: [1 + this.nSpriteOffset, 2 + this.nSpriteOffset, 3 + this.nSpriteOffset, 2 + this.nSpriteOffset],
-                }),
-            repeat: -1,
-            frameRate: 10          
-        });
+        if (!this.oGameScene.anims.exists("walk_" + this.nEntityID)) {        
+            this.oGameScene.anims.create({
+                key: "walk_" + this.nEntityID,
+                frames: this.oGameScene.anims.generateFrameNumbers(
+                    "48bitSprites", {
+                        // @ts-ignore
+                        frames: [1 + this.nSpriteOffset, 2 + this.nSpriteOffset, 3 + this.nSpriteOffset, 2 + this.nSpriteOffset],
+                    }),
+                repeat: -1,
+                frameRate: 10          
+            });
+        }
 
-        this.oGameScene.anims.create({
-            key: "walkup",
-            frames: this.oGameScene.anims.generateFrameNumbers(
-                "48bitSprites", {
-                    // @ts-ignore
-                    frames: [7 + this.nSpriteOffset, 8 + this.nSpriteOffset, 9 + this.nSpriteOffset, 8 + this.nSpriteOffset]
-                }),
-            repeat: -1,
-            frameRate: 10,
-        });
+        if (!this.oGameScene.anims.exists("walkup_" + this.nEntityID)) {
+            this.oGameScene.anims.create({
+                key: "walkup_" + this.nEntityID,
+                frames: this.oGameScene.anims.generateFrameNumbers(
+                    "48bitSprites", {
+                        // @ts-ignore
+                        frames: [7 + this.nSpriteOffset, 8 + this.nSpriteOffset, 9 + this.nSpriteOffset, 8 + this.nSpriteOffset]
+                    }),
+                repeat: -1,
+                frameRate: 10,
+            });
+        }
 
-        this.oGameScene.anims.create({
-            key: "attack",
-            frames: this.oGameScene.anims.generateFrameNumbers(
-                "48bitSprites", {
-                    // @ts-ignore
-                    frames: [4 + this.nSpriteOffset, 5 + this.nSpriteOffset, 6 + this.nSpriteOffset, 6 + this.nSpriteOffset, 5 + this.nSpriteOffset, 4 + this.nSpriteOffset]
-                }),
-            repeat: -1
-        });
+        if (!this.oGameScene.anims.exists("attack_" + this.nEntityID)) {
+            this.oGameScene.anims.create({
+                key: "attack_" + this.nEntityID,
+                frames: this.oGameScene.anims.generateFrameNumbers(
+                    "48bitSprites", {
+                        // @ts-ignore
+                        frames: [4 + this.nSpriteOffset, 5 + this.nSpriteOffset, 6 + this.nSpriteOffset, 6 + this.nSpriteOffset, 5 + this.nSpriteOffset, 4 + this.nSpriteOffset]
+                    }),
+                repeat: -1
+            });
+        }
 
-        this.oSprite.play("idle", false, 2 + this.nSpriteOffset);
+        this.oSprite.play("idle_" + this.nEntityID, false, 2 + this.nSpriteOffset);
     }
 
     startIdle(): void {
@@ -138,7 +149,6 @@ export default class Actor {
             if (typeof callback == "function") {
                 callback.call(context);
             }
-
             return;
         }
 
@@ -156,14 +166,6 @@ export default class Actor {
 
             return;
         }
-
-        // if (this.bIsPlayer && this.oGameScene.oActorsMap.hasOwnProperty(checkingPath.x + "." + checkingPath.y)) {
-        //     if (typeof callback == "function") {
-        //         callback.call(context);
-        //     }
-            
-        //     return; 
-        // }
     
         if (!this.bIsPlayer) {
             this.oGameScene.oActorsMap[checkingPath.x + "." + checkingPath.y] = this;
@@ -204,12 +206,12 @@ export default class Actor {
       
         if (direction) {
             this.oSprite.scaleX = direction;
-            this.oSprite.play("walk");
+            this.oSprite.play("walk_" + this.nEntityID);
         } else {
             if (target.y < this.oSprite.y) {
-                this.oSprite.play("walkup");
+                this.oSprite.play("walkup_" + this.nEntityID);
             } else {
-                this.oSprite.play("walk");
+                this.oSprite.play("walk_" + this.nEntityID);
             }
         }
     

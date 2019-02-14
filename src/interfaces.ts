@@ -100,5 +100,6 @@ export interface IActorsListItem {
     id: number,
     dmg?: number,
     title?: string,
-    isPlayer: boolean
+    isPlayer: boolean,
+    spriteOffset: number
 }

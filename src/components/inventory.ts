@@ -1,181 +1,153 @@
-import Helpers from '../helpers';
 import { GameScene } from '../scenes/gameScene';
 import Actor from './actor';
 import Item from './item';
 
-interface IIinvetorySprite extends Phaser.GameObjects.Sprite {
+interface IinvetorySprite extends Phaser.GameObjects.Sprite {
     id?             : number,
     decor?          : Phaser.GameObjects.Sprite,
     decorGraphics?  : Phaser.GameObjects.Sprite,
     special?        : boolean,
     item?           : Item,
-    slots?          : IIinvetorySprite[],
+    slots?          : IinvetorySprite[],
     items?          : Item[]
 }
 
 export default class Inventory {
+    public aItems                   : Item[];
+    public oBackground              : IinvetorySprite;    
+
+    public nSlots                   : number;
+    public nPadding                 : number;
+    public nIconSize                : number;
+    public nCols                    : number;
+    public nWidth                   : number;
+    public nHeight                  : number;
+    public nInitX                   : number;
+    public nInitY                   : number;
+    public bHasSpecialSlots         : boolean;
+    public sTitle                   : string;
+
     private oGameScene              : GameScene;
     private oActor                  : Actor;
     private oGroup                  : Phaser.GameObjects.Group;
     private oActiveItem             : Item;
     private aPending                : Item[];
-    public aItems                   : Item[];
-    private nSlots                  : number;
-    private nPadding                : number;
-    private nIconSize               : number;
-    private nCols                   : number;
-    private nWidth                  : number;
-    private nHeight                 : number;
-    private oHeader                 : IIinvetorySprite;
-    private oBackground             : IIinvetorySprite;
-    private oFakeBg                 : IIinvetorySprite;
-    private oInventoryContainer     : Phaser.GameObjects.Container;
-    private oBackgroundContainer    : Phaser.GameObjects.Container;     
 
-  constructor(gameScene : GameScene, actor : Actor) {
-    this.oGameScene = gameScene;
-    this.oActor     = actor;
-    this.oGroup     = this.oGameScene.oLayers.hud;
-    
-    this.aPending   = [];
-    this.aItems     = [];
-    this.nSlots     = 15;
+    private oHeader                 : IinvetorySprite;
+    private oFakeBg                 : IinvetorySprite;
+    private oBaseContainer          : Phaser.GameObjects.Container;
+    private oBackgroundContainer    : Phaser.GameObjects.Container;
 
-    this.nPadding   = 2;
-    this.nIconSize  = 35;
-    this.nCols      = 5;
+    constructor(gameScene: GameScene, actor: Actor) {
+        this.oGameScene = gameScene;
+        this.oActor     = actor;
+        this.oGroup     = this.oGameScene.oLayers.hud;
+        
+        this.aPending   = [];
+        this.aItems     = [];
 
-    this.oActiveItem = null;
-    
-    this.nWidth = 
-      (this.nIconSize * this.nCols) + 
-      (this.nPadding * this.nCols) + 
-      this.nPadding;
-    
-    this.nHeight =
-      (this.nIconSize * 
-      Math.ceil(this.nSlots / this.nCols)) +
-      this.nPadding *
-      Math.ceil(this.nSlots / this.nCols) +
-      this.nPadding;
-    
-
-    this.oInventoryContainer = this.oGameScene.add.container(window.innerWidth - (this.nWidth + 90) / 2, 30);
-    this.oInventoryContainer.setScrollFactor(0, 0);
-
-    this.oHeader = this.oGroup.create(0, 0, "inventory", "1.png");
-    // this.oHeader.displayWidth = this.nWidth + 60;
-    
-    // FixedToCamera
-    this.oHeader.setScrollFactor(0, 0);
-
-    this.oBackgroundContainer = this.oGameScene.add.container(this.oHeader.x + 18, this.oHeader.y + 30);
-    this.oBackground = this.oGroup.create(0, 0);
-    // this.oBackground.displayWidth = this.nWidth + 40;
-    // this.oBackground.displayHeight = this.nHeight + 15;
-    this.oBackgroundContainer.setScrollFactor(0, 0);    
-    this.oBackground.setScrollFactor(0, 0);
-    this.oBackground.slots = [];
-    this.oBackground.items = [];
-    this.oBackground.setVisible(false);
-    this.oBackgroundContainer.add(this.oBackground);
-
-    this.oFakeBg = this.oGroup.create(this.oHeader.x + 2, this.oHeader.y + 75, "inventory", 0);
-    this.oFakeBg.displayHeight = this.nHeight + 10;
-    this.oFakeBg.setScrollFactor(0, 0);
-
-    this.oInventoryContainer.add(this.oHeader);
-    this.oInventoryContainer.add(this.oBackgroundContainer);
-    this.oInventoryContainer.add(this.oFakeBg);
-    this.oInventoryContainer.bringToTop(this.oBackgroundContainer);
-
-    this.oInventoryContainer.setInteractive(new Phaser.Geom.Rectangle(this.oHeader.x - this.nWidth / 2, -9, this.nWidth, 18), Phaser.Geom.Rectangle.Contains);
-    this.oGameScene.input.setDraggable(this.oInventoryContainer);
-
-    this.oInventoryContainer.on("drag", (pointer: any, dragX: number, dragY: number) => {
-        this.oInventoryContainer.setPosition(dragX, dragY);
-    }, this);
-
-
-    let count = 0;
-    const decorGraphics  = this.oGameScene.make.graphics({x: 0, y: 0, add: false});
-    decorGraphics.fillStyle(0x448341, 1);
-    decorGraphics.fillRect(0, 0, this.nIconSize - 1, this.nIconSize);
-    decorGraphics.generateTexture("decorGraphics", this.nIconSize, this.nIconSize);
-
-    let decor: IIinvetorySprite;
-    let slot: IIinvetorySprite;
-    let decorContainer: Phaser.GameObjects.Container;
-
-    for (let y = this.nPadding + 5; y < this.nHeight; y += this.nIconSize + this.nPadding) {
-        for (let x = this.nPadding; x < this.nWidth; x += this.nIconSize + this.nPadding) {
-            if (count < this.nSlots) {
-                if (count < 5) {
-                    const index = count + 3 == 6 ? 5 : count + 3 > 6 ? count + 2 : count + 3;
-
-                    decor = this.oGameScene.add.sprite(x - this.nWidth / 2, y, "inventory", index + ".png");
-                    decor.alpha = 0.1;
-                    decor.displayWidth = this.nIconSize;
-                    decor.displayHeight = this.nIconSize - 3;
-
-                    // this.oBackgroundContainer.add(decor);
-                } else {            
-                    // decorContainer.add(this.oGameScene.add.sprite(x - this.nWidth / 2 - 8, y - 8, "ic_hand"));
-                    // decorContainer.add(this.oGameScene.add.sprite(x- this.nWidth / 2, y, "decorGraphics"));
-                    decor = this.oGameScene.add.sprite(x - this.nWidth / 2 - 8, y - 8, "ic_hand");
-                    decor.visible = false;
-
-                    // this.oBackgroundContainer.add(decor);
-                }
-
-                const i = count < 5 ? 15 : 16;
-                slot = this.oGameScene.add.sprite(x - this.nWidth / 2, y, "inventory", i + ".png");
-                slot.id = count + 1;
-                slot.displayWidth = this.nIconSize;
-                slot.displayHeight = this.nIconSize;
-                slot.special = count < 5;
-
-                if (!slot.special) {
-                    const decorGraphicsSprite = this.oGameScene.add.sprite(x - this.nWidth / 2 + 1, y, "decorGraphics");
-                    decorGraphicsSprite.visible = false;
-
-                    this.oBackgroundContainer.add(decorGraphicsSprite)
-                    slot.decorGraphics = decorGraphicsSprite;
-                }
-
-                this.oBackgroundContainer.add(decor);
-                slot.decor = decor;
-                
-                slot.tint = 0x736861;
-
-                this.oBackgroundContainer.add(slot);
-                this.oBackground.slots.push(slot);
-
-                count += 1;
-            }
-        }
+        this.oActiveItem = null;
     }
 
-    const text = this.oGameScene.add.text(-this.nWidth / 2 + 10, -4, "Инвентарь", {font: '14px Courier New', fill: '#ffffff'});
-    this.oInventoryContainer.add(text);
+    create():void {
+        this.oBaseContainer = this.oGameScene.add.container(this.nInitX, this.nInitY);
+        this.oBaseContainer.setScrollFactor(0, 0);
 
-    const self = this;
-    this.oGameScene.input.keyboard.on("keydown", function(e: KeyboardEvent) {
-        if (e.keyCode == 73) {
-            self.open()
+        this.oHeader = this.oGroup.create(0, 0, "inventory", "1.png");
+
+        // FixedToCamera
+        this.oHeader.setScrollFactor(0, 0);
+
+        this.oBackgroundContainer = this.oGameScene.add.container(this.oHeader.x + 18, this.oHeader.y + 30);
+        this.oBackground = this.oGroup.create(0, 0);
+
+        this.oBackgroundContainer.setScrollFactor(0, 0);    
+        this.oBackground.setScrollFactor(0, 0);
+        this.oBackground.slots = [];
+        this.oBackground.items = [];
+        this.oBackground.setVisible(false);
+        this.oBackgroundContainer.add(this.oBackground);
+
+        this.oFakeBg = this.oGroup.create(this.oHeader.x + 2, this.oHeader.y + 75, "inventory", 0);
+        this.oFakeBg.displayHeight = this.nHeight + 10;
+        this.oFakeBg.setScrollFactor(0, 0);
+
+        this.oBaseContainer.add(this.oHeader);
+        this.oBaseContainer.add(this.oBackgroundContainer);
+        this.oBaseContainer.add(this.oFakeBg);
+        this.oBaseContainer.bringToTop(this.oBackgroundContainer);
+
+        this.oBaseContainer.setInteractive(new Phaser.Geom.Rectangle(this.oHeader.x - this.nWidth / 2, -9, this.nWidth, 18), Phaser.Geom.Rectangle.Contains);
+        this.oGameScene.input.setDraggable(this.oBaseContainer);
+
+        this.oBaseContainer.on("drag", (pointer: any, dragX: number, dragY: number) => {
+            this.oBaseContainer.setPosition(dragX, dragY);
+        }, this);
+
+        let count = 0;
+        const decorGraphics  = this.oGameScene.make.graphics({x: 0, y: 0, add: false});
+        decorGraphics.fillStyle(0x448341, 1);
+        decorGraphics.fillRect(0, 0, this.nIconSize - 1, this.nIconSize);
+        decorGraphics.generateTexture("decorGraphics", this.nIconSize, this.nIconSize);
+        
+        let decor: IinvetorySprite;
+        let slot: IinvetorySprite;
+        
+        for (let y = this.nPadding + 5; y < this.nHeight; y += this.nIconSize + this.nPadding) {
+            for (let x = this.nPadding; x < this.nWidth; x += this.nIconSize + this.nPadding) {
+                if (count < this.nSlots) {
+                    if (count < 5 && this.bHasSpecialSlots) {
+                        const index = count + 3 == 6 ? 5 : count + 3 > 6 ? count + 2 : count + 3;
+                    
+                        decor = this.oGameScene.add.sprite(x - this.nWidth / 2, y, "inventory", index + ".png");
+                        decor.alpha = 0.1;
+                        decor.displayWidth = this.nIconSize;
+                        decor.displayHeight = this.nIconSize - 3;
+                    } else {            
+                        decor = this.oGameScene.add.sprite(x - this.nWidth / 2 - 8, y - 8, "ic_hand");
+                        decor.visible = false;
+                    }
+                
+                    const i = count < 5 ? 15 : 16;
+                    slot = this.oGameScene.add.sprite(x - this.nWidth / 2, y, "inventory", i + ".png");
+                    slot.id = count + 1;
+                    slot.displayWidth = this.nIconSize;
+                    slot.displayHeight = this.nIconSize;
+                    slot.special = count < 5;
+                
+                    if (!slot.special) {
+                        const decorGraphicsSprite = this.oGameScene.add.sprite(x - this.nWidth / 2 + 1, y, "decorGraphics");
+                        decorGraphicsSprite.visible = false;
+                    
+                        this.oBackgroundContainer.add(decorGraphicsSprite)
+                        slot.decorGraphics = decorGraphicsSprite;
+                    }
+                
+                    this.oBackgroundContainer.add(decor);
+                    slot.decor = decor;
+                    
+                    slot.tint = 0x736861;
+                
+                    this.oBackgroundContainer.add(slot);
+                    this.oBackground.slots.push(slot);
+                
+                    count += 1;
+                }
+            }
         }
-    });
-  }
+    
+        const text = this.oGameScene.add.text(-this.nWidth / 2 + 10, -4, this.sTitle, {font: '14px Courier New', fill: '#ffffff'});
+        this.oBaseContainer.add(text);
+    }
 
-    update() {
+    update():void {
         while (this.aPending.length > 0) {
             this.processItem(this.aPending.shift());
         }
     }
 
     open(): void {
-        this.oBackgroundContainer.visible = !this.oBackgroundContainer.visible;
-        this.oFakeBg.visible = !this.oFakeBg.visible;
+        this.oBaseContainer.visible = !this.oBaseContainer.visible;
     }
 
     addItem(item: Item): void {
@@ -222,6 +194,7 @@ export default class Inventory {
                 item.height = this.nIconSize;
 
                 emptySlot.item = item;
+
                 item.oSlot = emptySlot;
                 item.oActor = this.oActor;
 
@@ -255,7 +228,7 @@ export default class Inventory {
                     }  
                 }, this);
 
-                let heldItemSlot: IIinvetorySprite;
+                let heldItemSlot: IinvetorySprite;
                 item.on("drag", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
                     item.setPosition(dragX, dragY);
                     heldItemSlot = item.oSlot;
@@ -286,7 +259,7 @@ export default class Inventory {
     
                                 heldItemSlot.item = undefined;
                             }
-    
+
                             item.x = closestSlot.x;
                             item.y = closestSlot.y;
                         } else {
@@ -349,8 +322,8 @@ export default class Inventory {
         return false;
     }
 
-    findClosestSlotTo(slot: IIinvetorySprite) {
-        let closestSlot: IIinvetorySprite, dist: number;
+    findClosestSlotTo(slot: IinvetorySprite) {
+        let closestSlot: IinvetorySprite, dist: number;
         let lastDist = 50; 
         this.oBackground.slots.forEach(function(_slot) {
             if (!_slot.special) {
@@ -375,7 +348,7 @@ export default class Inventory {
         this.oActiveItem = undefined;
     }
 
-    disableDecor(slot: IIinvetorySprite): void {
+    disableDecor(slot: IinvetorySprite): void {
         slot.decor.visible = false;
         slot.decorGraphics.visible = false;
         slot.tint = 0x736861;

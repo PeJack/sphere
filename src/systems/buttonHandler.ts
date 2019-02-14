@@ -60,7 +60,8 @@ export interface IUpButtons {
     EIGHT:  boolean,
     NINE:   boolean,
     ZERO:   boolean,
-    E:      boolean
+    E:      boolean,
+    I:      boolean
 }
 
 export class ButtonHandler {
@@ -138,7 +139,8 @@ export class ButtonHandler {
             EIGHT:  false,
             NINE:   false,
             ZERO:   false,
-            E:      false
+            E:      false,
+            I:      false
         };
 
         this.oButtons.ONE.on("up", (e: KeyboardEvent)=> {
@@ -183,6 +185,10 @@ export class ButtonHandler {
         
         this.oButtons.E.on("up", (e: KeyboardEvent)=> {
             this.oUpButtons.E = true;
+        }, this);
+
+        this.oButtons.I.on("up", (e: KeyboardEvent)=> {
+            this.oUpButtons.I = true;
         }, this);
     }
 

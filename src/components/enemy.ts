@@ -16,7 +16,8 @@ export class Enemy extends Actor {
     constructor(gameScene : GameScene, data : IActorsListItem, pos : IPosition) {
         super(gameScene, pos);
         
-        this.nSpriteOffset = 0;
+        this.nEntityID = data.id;
+        this.nSpriteOffset = data.spriteOffset;
         this.nHp = 100;
         this.nSp = 110;
         this.nDamage = 1;
