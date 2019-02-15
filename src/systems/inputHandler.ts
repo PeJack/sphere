@@ -48,44 +48,44 @@ export class InputHandler {
             const path: IPath = {};
             let direction: string;
 
-            if (this.oUpButtons.ONE && this.oGameScene.oPlayer.oPocket.oBackground.slots[5].item) {
-                this.oGameScene.oPlayer.oPocket.activateItem(this.oGameScene.oPlayer.oPocket.oBackground.slots[5].item);
+            if (this.oUpButtons.ONE && this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[5].item) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[5].item);
             }
 
-            if (this.oUpButtons.TWO && this.oGameScene.oPlayer.oPocket.oBackground.slots[6].item) {
-                this.oGameScene.oPlayer.oPocket.activateItem(this.oGameScene.oPlayer.oPocket.oBackground.slots[6].item);
+            if (this.oUpButtons.TWO && this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[6].item) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[6].item);
             }
 
-            if (this.oUpButtons.THREE && this.oGameScene.oPlayer.oPocket.oBackground.slots[7].item) {
-                this.oGameScene.oPlayer.oPocket.activateItem(this.oGameScene.oPlayer.oPocket.oBackground.slots[7].item);
+            if (this.oUpButtons.THREE && this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[7].item) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[7].item);
             }
             
-            if (this.oUpButtons.FOUR && this.oGameScene.oPlayer.oPocket.oBackground.slots[8].item) {
-                this.oGameScene.oPlayer.oPocket.activateItem(this.oGameScene.oPlayer.oPocket.oBackground.slots[8].item);
+            if (this.oUpButtons.FOUR && this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[8].item) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[8].item);
             } 
             
-            if (this.oUpButtons.FIVE && this.oGameScene.oPlayer.oPocket.oBackground.slots[9].item) {
-                this.oGameScene.oPlayer.oPocket.activateItem(this.oGameScene.oPlayer.oPocket.oBackground.slots[9].item);
+            if (this.oUpButtons.FIVE && this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[9].item) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[9].item);
             }
             
-            if (this.oUpButtons.SIX && this.oGameScene.oPlayer.oPocket.oBackground.slots[10].item) {
-                this.oGameScene.oPlayer.oPocket.activateItem(this.oGameScene.oPlayer.oPocket.oBackground.slots[10].item);
+            if (this.oUpButtons.SIX && this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[10].item) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[10].item);
             }
             
-            if (this.oUpButtons.SEVEN && this.oGameScene.oPlayer.oPocket.oBackground.slots[11].item) {
-                this.oGameScene.oPlayer.oPocket.activateItem(this.oGameScene.oPlayer.oPocket.oBackground.slots[11].item);
+            if (this.oUpButtons.SEVEN && this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[11].item) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[11].item);
             }
             
-            if (this.oUpButtons.EIGHT && this.oGameScene.oPlayer.oPocket.oBackground.slots[12].item) {
-                this.oGameScene.oPlayer.oPocket.activateItem(this.oGameScene.oPlayer.oPocket.oBackground.slots[12].item);
+            if (this.oUpButtons.EIGHT && this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[12].item) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[12].item);
             }
             
-            if (this.oUpButtons.NINE && this.oGameScene.oPlayer.oPocket.oBackground.slots[13].item) {
-                this.oGameScene.oPlayer.oPocket.activateItem(this.oGameScene.oPlayer.oPocket.oBackground.slots[13].item);
+            if (this.oUpButtons.NINE && this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[13].item) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[13].item);
             }
             
-            if (this.oUpButtons.ZERO && this.oGameScene.oPlayer.oPocket.oBackground.slots[14].item) {
-                this.oGameScene.oPlayer.oPocket.activateItem(this.oGameScene.oPlayer.oPocket.oBackground.slots[14].item);
+            if (this.oUpButtons.ZERO && this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[14].item) {
+                this.oGameScene.oPlayer.oInventory.activateItem(this.oGameScene.oPlayer.oInventory.oPocket.oBackground.slots[14].item);
             }
             
             if (this.oUpButtons.E || this.oDownButtons.E) {
@@ -97,8 +97,7 @@ export class InputHandler {
             }
 
             if (this.oUpButtons.I) {
-                this.oGameScene.oPocket.open();
-                this.oGameScene.oBag.open();
+                this.oGameScene.oInventory.open();
             }
 
             if (this.oDownButtons.UP) {
@@ -153,7 +152,7 @@ export class InputHandler {
     }
 
     handleInputTap(pointer: Phaser.Input.Pointer): void {
-        // for(const item of this.oGameScene.oPocket.aItems) {
+        // for(const item of this.oGameScene.oInventory.oPocket.aItems) {
         //     this.attack();
         // }
     }

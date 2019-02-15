@@ -2,8 +2,7 @@ import { GameScene } from '../scenes/gameScene';
 import { IPath, IPosition } from '../interfaces';
 import Item from './item';
 import { ButtonHandler, IDownButtons } from '../systems/buttonHandler';
-import { Pocket } from './pocket';
-import { Bag } from './bag';
+import Inventory from './inventory';
 
 //@ts-ignore
 interface ISpriteAdd extends Phaser.GameObjects.Sprite {
@@ -37,8 +36,7 @@ export default class Actor {
     public nDamage              : number;
     public oButtonHandler       : ButtonHandler;
     public oDownButtons         : IDownButtons;
-    public oPocket              : Pocket;
-    public oBag                 : Bag;
+    public oInventory           : Inventory;
 
     private bWalking            : boolean;
     private sCurrDir            : string; 

@@ -3,8 +3,7 @@ import Actor from './actor';
 import {ButtonHandler, IDownButtons} from '../systems/buttonHandler';
 import { IActorsListItem, IPosition } from '../interfaces';
 import Item from './item';
-import { Pocket } from './pocket';
-import { Bag } from './bag';
+import Inventory from './inventory';
 
 export class Player extends Actor {
     public nSpriteOffset    : number;
@@ -15,8 +14,7 @@ export class Player extends Actor {
     public oButtonHandler   : ButtonHandler;
     public oDownButtons     : IDownButtons;
     public bIsPlayer        : boolean;
-    public oPocket          : Pocket;
-    public oBag             : Bag;
+    public oInventory       : Inventory;
 
     constructor(gameScene : GameScene, data : IActorsListItem, pos : IPosition) {
         super(gameScene, pos);
@@ -37,6 +35,6 @@ export class Player extends Actor {
     }
 
     pickUp(item: Item) : void {
-        this.oPocket.addItem(item);
+        this.oInventory.addItem(item);
     }
 }

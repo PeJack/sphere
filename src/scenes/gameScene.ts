@@ -10,10 +10,9 @@ import { EffectsManager } from "../systems/effectsManager";
 import { ActorsManager } from "../systems/actorsManager";
 import { ItemsManager } from "../systems/itemsManager";
 import { InputHandler } from "../systems/InputHandler";
-import { Pocket } from "../components/pocket";
 
 import Helpers from "../helpers";
-import { Bag } from "../components/bag";
+import Inventory from "../components/inventory";
 
 interface ILayers {
     effects   : Phaser.GameObjects.Group,
@@ -45,8 +44,7 @@ export class GameScene extends Phaser.Scene {
     public oButtonHandler   : ButtonHandler;
     public oInputHandler    : InputHandler;
     public oEffectsManager  : EffectsManager;
-    public oPocket          : Pocket;
-    public oBag             : Bag;
+    public oInventory       : Inventory;
 
     constructor() {
         super({
@@ -97,15 +95,13 @@ export class GameScene extends Phaser.Scene {
         }
 
         this.oPlayer = this.oActorsManager.create(0);
-        for (let i = 1; i < 10; i++) {
-            this.oActorsManager.create(Helpers.random(1,2));
-        }
+        // for (let i = 1; i < 10; i++) {
+        //     this.oActorsManager.create(Helpers.random(1,2));
+        // }
 
-
-        this.oPocket = new Pocket(this, this.oPlayer);
-        this.oPlayer.oPocket = this.oPocket;
-
-        this.oBag    = new Bag(this, this.oPlayer);
+        this.oInventory = new Inventory(this, this.oPlayer);
+        this.oPlayer.oInventory = this.oInventory;
+        this.oPlayer.oInventory.setEnabled(this.oPlayer.oInventory.oBag, true);
 
         this.cameras.main.setBounds(0, 0, this.oMapsManager.nCols * this.nTileSize, this.oMapsManager.nRows * this.nTileSize);        
         this.cameras.main.startFollow(this.oPlayer.oSprite);
@@ -127,8 +123,6 @@ export class GameScene extends Phaser.Scene {
                 actor.aiAct();
             }
         })
-
-        this.oPlayer.oPocket.update();
 
         if (this.oPlayer.oWeapon) {
             this.oPlayer.oWeapon.update();
