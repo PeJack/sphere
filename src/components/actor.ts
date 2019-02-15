@@ -176,7 +176,7 @@ export default class Actor {
         if (newCoords.y) {
             this.oSprite.target.y = newCoords.y;
         }
-    
+
         this.sCurrDir = direction;
         this.oGameScene.tweens.add({
             targets: this.oSprite,

@@ -66,8 +66,8 @@ class Helpers {
     }  
 
     pointInCircle (x: number, y: number, cx: number, cy: number, radius: number): boolean {
-        let distancesquared = (x - cx) * (x - cx) + (y - cy) * (y - cy);
-        return distancesquared <= radius * radius;
+        let distancesquared = ((x - cx) * (x - cx)) + ((y - cy) * (y - cy));
+        return distancesquared <= (radius * radius);
     }   
 
     lerp(start: number, end: number, t: number): number {

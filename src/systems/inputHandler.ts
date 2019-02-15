@@ -152,9 +152,9 @@ export class InputHandler {
     }
 
     handleInputTap(pointer: Phaser.Input.Pointer): void {
-        // for(const item of this.oGameScene.oInventory.oPocket.aItems) {
-        //     this.attack();
-        // }
+        if (this.oGameScene.oPlayer.oWeapon) {
+            this.attack();
+        }
     }
 
     startWalk(path : IPath[], direction : string): void {
@@ -171,7 +171,6 @@ export class InputHandler {
     }
 
     attack(): void {
-        if (!this.oGameScene.oPlayer.oWeapon) { return };
         this.oGameScene.oPlayer.oWeapon.attack(this.oGameScene.input.activePointer);
     }
 

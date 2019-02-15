@@ -53,7 +53,7 @@ class Item extends Phaser.GameObjects.Sprite {
         this.width          = this.oGameScene.nTileSize;
         this.height         = this.oGameScene.nTileSize;  
         this.nDamage        = aData[18];
-        this.nRange         = aData[39];
+        this.nRange         = 300;
         this.oRangeObject   = this.setRangeObject();
         this.nReloadTime    = aData[37];    
         this.fEffect        = this.setEffect();
@@ -99,7 +99,7 @@ class Item extends Phaser.GameObjects.Sprite {
         rangeObject.range = this.nRange;
         rangeObject.lineStyle(2, 0xFF0000, 0.2);
         rangeObject.strokeCircle(0, 0, this.nRange);
-        // rangeObject = this.addChild(rangeObject);
+
         rangeObject.visible = false;  
         
         return rangeObject;
@@ -172,19 +172,19 @@ class Item extends Phaser.GameObjects.Sprite {
         let dx: number, dy: number;
         let diagonalDist: number;
         let newPath : IPoint[] = [];  
-      
+
         obj1 = {x: path.worldX, y: path.worldY};
         obj2 = {x: this.oRangeObject.x, y: this.oRangeObject.y};
         angle = (Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x) * 180 / Math.PI);   
-        
+
         if (!Helpers.pointInCircle(
             path.worldX, path.worldY, 
             this.oRangeObject.x, 
             this.oRangeObject.y, 
-            this.oRangeObject.range / 2)
+            this.oRangeObject.range)
         ) {
-            x = obj2.x - (this.oRangeObject.range / 2) * Math.cos(-angle * Math.PI / 180);
-            y = obj2.y + (this.oRangeObject.range / 2) * Math.sin(-angle * Math.PI / 180);      
+            x = obj2.x - (this.oRangeObject.range) * Math.cos(-angle * Math.PI / 180);
+            y = obj2.y + (this.oRangeObject.range) * Math.sin(-angle * Math.PI / 180);      
         } else {
             x = path.worldX;
             y = path.worldY;
@@ -204,15 +204,17 @@ class Item extends Phaser.GameObjects.Sprite {
         dy = Math.abs(targetPoint.y - startPoint.y);
         diagonalDist = Math.max(dx, dy);  
       
-        let point: IPoint, checkingPoint: IPoint; 
+        let point: IPoint; 
         let t: number;
-      
+        const checkingPoint = {} as IPoint;
+
         for (let step = 0; step <= diagonalDist; step++) {
             t = diagonalDist == 0 ? 0.0 : step / diagonalDist;
-            point = Helpers.lerpPoint(startPoint, targetPoint, t);  
+            point = Helpers.lerpPoint(startPoint, targetPoint, t); 
+
             checkingPoint.x = point.x;
             checkingPoint.y = point.y;  
-        
+
             if (!this.oGameScene.oMapsManager.isWalkable(checkingPoint)) {
                 break;
             } else {
@@ -220,16 +222,18 @@ class Item extends Phaser.GameObjects.Sprite {
             }
         }
 
-        newPath = newPath.map(function(np) {
-            return this.oGameScene.posToCoord(np);
-        }, this); 
-      
-        if (!newPath.length) {
+        const coordPath = [] as IPoint[];
+        newPath.forEach((np: IPoint)=> {
+            let _coordPath = this.oGameScene.posToCoord(np);
+            coordPath.push({x: _coordPath.x, y: _coordPath.y});
+        });
+ 
+        if (!coordPath.length) {
             return;
-        } else if (newPath.length == 1) {
-            startPoint = newPath[0];      
+        } else if (coordPath.length == 1) {
+            startPoint = coordPath[0];      
         } else {
-            startPoint = newPath.shift();
+            startPoint = coordPath.shift();
         };    
         this.oActor.oSprite.anims.play("attack");
 
@@ -240,8 +244,7 @@ class Item extends Phaser.GameObjects.Sprite {
         this.bReloading = true;
         this.oVisualTimer.oSprite.visible = true;
         this.oVisualTimer.start();
-
-        this.createProjectile(newPath, projectile);
+        this.createProjectile(coordPath, projectile);
     }   
     
     createProjectile(path: IPoint[], projectile: Phaser.GameObjects.Sprite): void {
@@ -249,10 +252,9 @@ class Item extends Phaser.GameObjects.Sprite {
             projectilePos: IPosition = this.oGameScene.getPosition(projectile),
             firstPathPos: IPosition = this.oGameScene.getPosition(firstPath),
             delay: number = 25 * (Math.abs(projectilePos.x - firstPathPos.x) + Math.abs(projectilePos.y - firstPathPos.y));   
-         
-      
+
         if (path.length != 0) {
-            const missleTween: Phaser.Tweens.Tween = this.oGameScene.tweens.add({
+            this.oGameScene.tweens.add({
                 targets: projectile,
                 x: firstPath.x,
                 y: firstPath.y,
@@ -263,11 +265,9 @@ class Item extends Phaser.GameObjects.Sprite {
                 },
                 onCompleteScope: this,
                 onCompleteParams: [path, projectile],          
-            });
-
-            missleTween.play(false);            
+            });   
         } else {
-            const missleTween: Phaser.Tweens.Tween = this.oGameScene.tweens.add({
+            this.oGameScene.tweens.add({
                 targets: projectile,
                 x: firstPath.x,
                 y: firstPath.y,
@@ -279,8 +279,6 @@ class Item extends Phaser.GameObjects.Sprite {
                 onCompleteScope: this,
                 onCompleteParams: [projectile],          
             });
-
-            missleTween.play(false); 
         } 
     }
 

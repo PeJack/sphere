@@ -47,21 +47,25 @@ export default class VisualTimer {
         }
 
         this.bHasFinished = false;
-        this.oSprite.width = this.nFullWidth;
+        this.oSprite.displayWidth = this.nFullWidth;
         this.oSprite.visible = true;
         this.oBackground.visible = true;
 
         this.oTimer = this.oGameScene.tweens.add({
             targets: this.oSprite,
-            width: 0,
+            displayWidth: 0,
             ease: 'Linear',
             duration: this.nTotalTime * 1000,
             onComplete: function() {
                 this.bHasFinished = true;
                 this.oSprite.visible = false;
                 this.oBackground.visible = false;
+
+                if (typeof this.fOnComplete === "function") {
+                    this.fOnComplete();
+                };
             },
-            onCompleteScope: this,      
+            onCompleteScope: this,
         });
     }
   
@@ -72,7 +76,7 @@ export default class VisualTimer {
   
     start(): void {
         this.reset();
-        this.oTimer.play(false);
+        // this.oTimer.play(false);
     }
   
     stop(): void {
