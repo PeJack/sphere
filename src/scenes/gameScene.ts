@@ -90,8 +90,12 @@ export class GameScene extends Phaser.Scene {
     run(): void {
         this.oInputHandler.start();
 
-        for (let i = 0; i < 50; i++) {
-            this.oItemsManager.create(Helpers.random(201, 212));
+        for (let i = 0; i < 20; i++) {
+            this.oItemsManager.create(Helpers.random(3533, 3557));
+        }
+
+        for (let i = 0; i < 20; i++) {
+            this.oItemsManager.create(Helpers.random(3780, 3790));
         }
 
         this.oPlayer = this.oActorsManager.create(0);

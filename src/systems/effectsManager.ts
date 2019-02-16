@@ -29,8 +29,9 @@ export class EffectsManager {
                 "48bitSprites", {
                     // @ts-ignore
                     frames: [off, off + 1, off + 1]
-                }),
-            repeat: -1
+                }
+            ),
+            hideOnComplete: true
         });
 
         off = Helpers.oSpriteOffset.strike2;
@@ -40,8 +41,9 @@ export class EffectsManager {
                 "48bitSprites", {
                     // @ts-ignore
                     frames: [off, off + 1, off + 1]
-                }),
-            repeat: -1
+                }
+            ),
+            hideOnComplete: true
         });
         
         off = Helpers.oSpriteOffset.strike3;
@@ -52,18 +54,18 @@ export class EffectsManager {
                     // @ts-ignore
                     frames: [off, off + 1, off + 1]
                 }),
-            repeat: -1
         });         
     }
 
     strike(x: number, y: number, callback?: Function): void {
+
         if (callback) {
             this.oSprite.removeListener("animationcomplete", callback, this, true);
             this.oSprite.once("animationcomplete", callback, this);
         }
 
         this.oSprite.setPosition(x, y - 6);
-        
+        this.oSprite.setVisible(true);
         if (Math.round(1 * Math.random())) {
             this.oSprite.anims.play("strike1");
         } else {
@@ -78,6 +80,7 @@ export class EffectsManager {
         }
 
         this.oSprite.setPosition(x, y - 6);
+        this.oSprite.setVisible(true);        
         this.oSprite.anims.play("scratch");
     }
 }

@@ -32,31 +32,31 @@ interface IInventory {
     nInitY                          : number,
     bHasSpecialSlots                : boolean,
     sTitle                          : string,
-    bEnabled                        : boolean
-    nRemainingSlots                 : number
+    bEnabled                        : boolean,
+    nRemainingSlots                 : number,
 }
 
 export default class Inventory {
-    public aItems                   : Item[]; 
+    public aItems                   : Item[];
+    public bPointerOver             : boolean; 
 
     private oGameScene              : GameScene;
     private oActor                  : Actor;
     private oGroup                  : Phaser.GameObjects.Group;
     private oActiveItem             : Item;
-    private aPending                : Item[];
     
     public oPocket                  : IInventory;
     public oBag                     : IInventory;
 
     constructor(gameScene: GameScene, actor: Actor) {
-        this.oGameScene = gameScene;
-        this.oActor     = actor;
-        this.oGroup     = this.oGameScene.oLayers.hud;
+        this.oGameScene   = gameScene;
+        this.oActor       = actor;
+        this.oGroup       = this.oGameScene.oLayers.hud;
         
-        this.aPending   = [];
-        this.aItems     = [];
+        this.bPointerOver = false;
+        this.aItems       = [];
 
-        this.oActiveItem = null;
+        this.oActiveItem  = null;
 
         // Инициализация "кармана" (основной сумки)
         this.oPocket = {} as IInventory;
@@ -117,6 +117,19 @@ export default class Inventory {
         this.oPocket.bEnabled = false;      
         
         this.create(this.oBag);
+        
+
+        this.oGameScene.input.on("gameobjectover", (pointer, gameObject, event)=> {
+            if (gameObject && (gameObject.sType == "slot" || gameObject == this.oPocket.oBaseContainer || gameObject == this.oBag.oBaseContainer)) {
+                this.bPointerOver = true;
+            } 
+        });
+
+        this.oGameScene.input.on("gameobjectout", (pointer, gameObject, event)=> {
+            if (gameObject && (gameObject.sType == "slot" || gameObject == this.oPocket.oBaseContainer || gameObject == this.oBag.oBaseContainer)) {
+                this.bPointerOver = false;
+            }
+        });
 
         this.oGameScene.input.on("dragenter", (pointer: Phaser.Input.Pointer, gameObject, target)=> {
             if (target.sType == "slot") {
@@ -258,12 +271,6 @@ export default class Inventory {
         this.setEnabled(inv, inv.bEnabled);
     }
 
-    // update():void {
-    //     while (this.aPending.length > 0) {
-    //         this.processItem(this.aPending.shift());
-    //     }
-    // }
-
     open(): void {
         this.oPocket.oBaseContainer.visible = !this.oPocket.oBaseContainer.visible;
 
@@ -358,8 +365,8 @@ export default class Inventory {
 
                 item.on("pointerup", (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Event) => {
                     if (pointer.leftButtonDown) {
-                        this.activateItem(item);
-                    }  
+                        this.activateItem(item);                    
+                    }
                 }, this);
 
                 let heldItemSlot: IInventorySprite;

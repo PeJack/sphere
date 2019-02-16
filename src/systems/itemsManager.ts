@@ -11,7 +11,7 @@ export class ItemsManager {
 
     constructor(gameScene: GameScene) {
         this.oGameScene = gameScene;
-        this.aList = this.oGameScene.sys.game.cache.json.get("items").items;
+        this.aList = this.oGameScene.sys.game.cache.json.get("items_list").items;
     }
 
     init(): void {
@@ -27,8 +27,8 @@ export class ItemsManager {
     
     create(id: number, pos?: IPosition, actor?: Actor): Item {
         let i: IItem, data: IItem, item: Item;
-        i = this.aList.find((el)=> {
-            if (el[0] === id) {
+        i = this.aList.find((el: IItem)=> {
+            if (el.id === id) {
                 return true;
             }
             return false;

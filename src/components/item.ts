@@ -23,9 +23,16 @@ class Item extends Phaser.GameObjects.Sprite {
     public nMaxStack        : number;
     private nRange          : number;
     private nReloadTime     : number;
-    private nDamage         : number;
+    /** минимальный физ урон */
+    private nFaMinDmg       : number;
+    /** максимальный физ урон */    
+    private nFaMaxDmg       : number;
+    /** минимальный маг урон */    
+    private nMaMinDmg       : number;
+    /** максимальный маг урон */     
+    private nMaMaxDmg       : number;    
     public nLevel           : number;
-    private aData           : IItem;
+    private oData           : IItem;
     private fEffect         : Function;
     public oSlot            : any;
     
@@ -34,28 +41,35 @@ class Item extends Phaser.GameObjects.Sprite {
     public oLevelText       : Phaser.GameObjects.Text;
     public oStackText       : Phaser.GameObjects.Text;    
     
-    constructor(gameScene : GameScene, aData : IItem, pos : IPosition, actor : Actor) {
-        super(gameScene, pos.x, pos.y, aData[3], 0); 
+    constructor(gameScene : GameScene, oData : IItem, pos : IPosition, actor : Actor) {
+        super(gameScene, pos.x, pos.y, "items_spritesheet", oData.sprite + ".png"); 
 
         this.oGameScene     = gameScene;
         this.oGroup         = this.oGameScene.oLayers.items;
         this.oGroup.add(this, true);
 
         this.oActor         = actor;
-        this.aData          = aData;
-        this.nId            = aData[0];
-        this.sSpriteName    = aData[3];
-        this.sType          = "weapon";
-        this.sAttackType    = "range";
-        this.nLevel         = aData[5];
+        this.oData          = oData;
+        this.nId            = oData.id;
+        this.sSpriteName    = oData.sprite;
+        this.sType          = oData.type;
+
+        if (this.sType === "weapon") {
+            this.sAttackType = oData.distance > 5 ? "range" : "melee";
+        }
+
+        this.nLevel         = oData.rank;
         this.nStack         = 1;
         this.nMaxStack      = 1;
         this.width          = this.oGameScene.nTileSize;
         this.height         = this.oGameScene.nTileSize;  
-        this.nDamage        = aData[18];
-        this.nRange         = 300;
+        
+        [this.nFaMinDmg, this.nFaMaxDmg] = this.getDamage(oData.fa_atk, oData.dmg_spread);
+        [this.nMaMinDmg, this.nMaMaxDmg] = this.getDamage(oData.ma_atk, oData.dmg_spread);
+
+        this.nRange         = oData.distance * 10;
         this.oRangeObject   = this.setRangeObject();
-        this.nReloadTime    = aData[37];    
+        this.nReloadTime    = oData.delay_sec;    
         this.fEffect        = this.setEffect();
         this.bReloading     = false;    
         this.oVisualTimer   = new VisualTimer({
@@ -91,6 +105,15 @@ class Item extends Phaser.GameObjects.Sprite {
                     return this.oGameScene.oEffectsManager.strike;
                 }
         }
+    }
+
+    getDamage(atk: number, spread: number): [number, number] {
+        if (atk == 0) return [0, 0];
+        const x = atk * (1 + spread) / 10;
+        const min = Math.floor(atk - x);
+        const max = Math.ceil(atk + x);
+
+        return [min, max];
     }
 
     private setRangeObject(): IRangeObject {
@@ -143,22 +166,25 @@ class Item extends Phaser.GameObjects.Sprite {
             path.worldX, path.worldY, 
             this.oRangeObject.x, 
             this.oRangeObject.y, 
-            this.oRangeObject.range / 2)
+            this.oRangeObject.range)
         ) {
             obj1 = {x: path.worldX, y: path.worldY};
             obj2 = {x: this.oRangeObject.x, y: this.oRangeObject.y};
             angle = (Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x) * 180 / Math.PI);
 
-            x = obj2.x - (this.oRangeObject.range / 2) * Math.cos(-angle * Math.PI / 180);
-            y = obj2.y + (this.oRangeObject.range / 2) * Math.sin(-angle * Math.PI / 180);      
+            x = obj2.x - (this.oRangeObject.range) * Math.cos(-angle * Math.PI / 180);
+            y = obj2.y + (this.oRangeObject.range) * Math.sin(-angle * Math.PI / 180);      
         } else {
             x = path.worldX;
             y = path.worldY;
         }  
       
         this.oActor.oSprite.scaleX = newScale;    
-        this.oActor.oSprite.anims.play("attack");
+        this.oActor.oSprite.anims.play("attack_" + this.oActor.nEntityID);
         this.fEffect.call(this.oGameScene.oEffectsManager, x, y);
+        this.bReloading = true;
+        this.oVisualTimer.oSprite.visible = true;
+        this.oVisualTimer.start();
     }
 
     rangeAttack(path: IPath): void {
@@ -235,7 +261,7 @@ class Item extends Phaser.GameObjects.Sprite {
         } else {
             startPoint = coordPath.shift();
         };    
-        this.oActor.oSprite.anims.play("attack");
+        this.oActor.oSprite.anims.play("attack_" + this.oActor.nEntityID);
 
         const projectile : Phaser.GameObjects.Sprite = this.oGameScene.oLayers.effects.create(startPoint.x, startPoint.y, "48bitSprites");
         projectile.setFrame(Helpers.oSpriteOffset.normalArrow);

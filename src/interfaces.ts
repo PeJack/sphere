@@ -66,34 +66,95 @@ export interface ISpriteOffset {
 
 /**
   * Элемент массива items.
-  * @param index0 id
-  * @param index1 класс
-  * @param index2 человеческое название
-  * @param index3 название спрайта
-  * @param index4 ?
-  * @param index5 уровень
-  * @param ...
-  * @param index18 урон
-  * @param ...
-  * @param index37 перезарядка
-  */
+**/
 export interface IItem {
-    /** id */
-    0: number,
-    /** класс */    
-    1: string,
-    /** человеческое название */    
-    2: string,
-    /** название спрайта */     
-    3: string,
-    /** ? */
-    4: number,
-    /** уровень */
-    5: number,
-    /** урон */
-    18: number,
-    /** перезарядка */
-    37: number
+    id: number,
+    prefix: number,
+    name: string,
+    sprite: string,
+    /** тип */
+    type: string,
+    /** слот в кукле (меню) персонажа */ 
+    slot: number,
+    rank: number,
+    hp_per_use: number,
+    mp_per_use: number,
+    /** требуемый титул (воинский уровень) */
+    req_title: number,
+    /**  требуемая степень (магический уровень) */
+    req_degree: number,
+    /**  требуемая карма */
+    req_karma: number,
+    /**  требуемая специальность */
+    req_spec: number,
+    req_spec_lvl: number,
+    /** требуемые характеристики */
+    req_stats: IStats,
+    /** рейтинг физической атаки */
+    fa_atk: number,
+    /** рейтинг магической атаки */
+    ma_atk: number,
+    mam_atk: number,
+    /** разброс урона */
+    dmg_spread: number,
+    /** дает hp при использовании */
+    hp_give: number,
+    /** дает mp при использовании */
+    mp_give: number,
+    /** дает hp при использовании за тик (2 минуты) */
+    hp_2m_give: number,
+    /** дает mp  при использовании за тик (2 минуты) */
+    mp_2m_give: number,
+    /** физическая защита */
+    f_def: number,
+    /** магическая защита */
+    m_def: number,
+    /** бонус (не всегда положительный) к характеристикам */
+    bonus_stats: IStats,
+    /** бонус к максимальному hp */
+    hp_bonus: number,
+    /** бонус к максимальному mp */
+    mp_bonus: number,
+    /** бонус к физической атаке */
+    fa_bonus: number,
+    /** бонус к магической атаке */
+    ma_bonus: number,
+    /** задержка после использования в секундах */
+    delay_sec: number,
+    /** перезарядка способности */
+    cooldown: number,
+    /** дистанция применения */
+    distance: number,
+    /** дистанция разброса (aoe) */
+    distance_aoe: number,
+    /** иконка мутатора */
+    mutator_icon: string,
+    /** длительность действия мутатора */
+    mutator_len: number,
+    /** описание действия мутатора */
+    mutator_desc: string 
+}
+
+let qwe: IItem
+qwe.slot
+
+export interface IStats {
+    /** сила */
+    str: number,
+    /** ловкость */
+    agi: number,
+    /** меткость */
+    dex: number,
+    /** выносливость */
+    vit: number,
+    /** магия земли */
+    earth: number,
+    /** магия воздуха */
+    air: number,
+    /** магия воды */
+    water: number,
+    /** магия огня */
+    fire: number 
 }
 
 export interface IActorsListItem {

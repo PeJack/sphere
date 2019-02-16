@@ -126,8 +126,9 @@ export default class Actor {
                     "48bitSprites", {
                         // @ts-ignore
                         frames: [4 + this.nSpriteOffset, 5 + this.nSpriteOffset, 6 + this.nSpriteOffset, 6 + this.nSpriteOffset, 5 + this.nSpriteOffset, 4 + this.nSpriteOffset]
-                    }),
-                repeat: -1
+                    }
+                ),
+                frameRate: 12
             });
         }
 

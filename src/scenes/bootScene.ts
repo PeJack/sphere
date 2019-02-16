@@ -39,8 +39,8 @@ export class BootScene extends Phaser.Scene {
         );
 
         this.load.image('forest-tiles', 'assets/sprites/foresttiles_0.png');
-        this.load.json('items', 'assets/data/items.json');
-        
+        this.load.json('items_list', 'assets/data/items.json');
+
         this.loadUI();
         this.loadItems();
     }
@@ -70,8 +70,6 @@ export class BootScene extends Phaser.Scene {
     }
 
     private loadItems(): void {
-        this.load.image('wp_arb11', 'assets/sprites/weapons/wp_arb11.png');
-        this.load.image('wp_arb12', 'assets/sprites/weapons/wp_arb12.png');
-        this.load.image('wp_arb13', 'assets/sprites/weapons/wp_arb13.png'); 
+        this.load.atlas("items_spritesheet", 'assets/sprites/items.png','assets/sprites/items.json');
     }
 }
