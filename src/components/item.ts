@@ -67,9 +67,9 @@ class Item extends Phaser.GameObjects.Sprite {
         [this.nFaMinDmg, this.nFaMaxDmg] = this.getDamage(oData.fa_atk, oData.dmg_spread);
         [this.nMaMinDmg, this.nMaMaxDmg] = this.getDamage(oData.ma_atk, oData.dmg_spread);
 
-        this.nRange         = oData.distance * 10;
+        this.nRange         = oData.distance * 8;
         this.oRangeObject   = this.setRangeObject();
-        this.nReloadTime    = oData.delay_sec;    
+        this.nReloadTime    = 0.5 // oData.delay_sec;    
         this.fEffect        = this.setEffect();
         this.bReloading     = false;    
         this.oVisualTimer   = new VisualTimer({
@@ -182,6 +182,55 @@ class Item extends Phaser.GameObjects.Sprite {
         this.oActor.oSprite.scaleX = newScale;    
         this.oActor.oSprite.anims.play("attack_" + this.oActor.nEntityID);
         this.fEffect.call(this.oGameScene.oEffectsManager, x, y);
+    
+        const target = this.oGameScene.getPosition({x: x, y: y});
+        let targetActor = this.oGameScene.oActorsMap[target.x + "." + target.y];
+
+        if (!targetActor) {
+            let i = 0;
+            while (i < 7) {
+                switch (i) {
+                    case 0:
+                        targetActor = this.oGameScene.oActorsMap[(target.x-1) + "." + (target.y-1)];
+                        break;
+                    case 1:
+                        targetActor = this.oGameScene.oActorsMap[(target.x-1) + "." + (target.y)];
+                        break;  
+                    case 2:
+                        targetActor = this.oGameScene.oActorsMap[(target.x-1) + "." + (target.y+1)];
+                        break;
+                    case 3:
+                        targetActor = this.oGameScene.oActorsMap[(target.x) + "." + (target.y-1)];
+                        break;   
+                    case 4:
+                        targetActor = this.oGameScene.oActorsMap[(target.x) + "." + (target.y+1)];
+                        break; 
+                    case 5:
+                        targetActor = this.oGameScene.oActorsMap[(target.x+1) + "." + (target.y-1)];
+                        break;  
+                    case 6:
+                        targetActor = this.oGameScene.oActorsMap[(target.x+1) + "." + (target.y)];
+                        break;  
+                    case 7:
+                        targetActor = this.oGameScene.oActorsMap[(target.x+1) + "." + (target.y+1)];
+                        break;                                                                                                                                                                      
+                }
+
+                if (targetActor) {
+                    i = 7;
+                } else {
+                    i++;
+                }
+            }
+        }
+
+        if (targetActor) {
+            targetActor.hurt(
+                Helpers.random(this.nFaMaxDmg, this.nFaMinDmg), 
+                Helpers.random(this.nMaMaxDmg, this.nMaMinDmg)
+            );
+        }
+
         this.bReloading = true;
         this.oVisualTimer.oSprite.visible = true;
         this.oVisualTimer.start();
@@ -291,7 +340,7 @@ class Item extends Phaser.GameObjects.Sprite {
                 },
                 onCompleteScope: this,
                 onCompleteParams: [path, projectile],          
-            });   
+            });
         } else {
             this.oGameScene.tweens.add({
                 targets: projectile,

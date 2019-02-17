@@ -155,7 +155,7 @@ export class InputHandler {
         if (this.oGameScene.oPlayer.oInventory.bPointerOver) return;
         
         if (this.oGameScene.oPlayer.oWeapon) {
-            this.attack();
+            this.attack(this.oGameScene.input.activePointer);
         }
     }
 
@@ -172,8 +172,8 @@ export class InputHandler {
         }
     }
 
-    attack(): void {
-        this.oGameScene.oPlayer.oWeapon.attack(this.oGameScene.input.activePointer);
+    attack(path: IPath): void {
+        this.oGameScene.oPlayer.oWeapon.attack(path);
     }
 
     update(): void {

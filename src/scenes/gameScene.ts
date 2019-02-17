@@ -99,9 +99,9 @@ export class GameScene extends Phaser.Scene {
         }
 
         this.oPlayer = this.oActorsManager.create(0);
-        // for (let i = 1; i < 10; i++) {
-        //     this.oActorsManager.create(Helpers.random(1,2));
-        // }
+        for (let i = 1; i < 10; i++) {
+            this.oActorsManager.create(Helpers.random(1,2));
+        }
 
         this.oInventory = new Inventory(this, this.oPlayer);
         this.oPlayer.oInventory = this.oInventory;

@@ -3,6 +3,7 @@ import { IPath, IPosition } from '../interfaces';
 import Item from './item';
 import { ButtonHandler, IDownButtons } from '../systems/buttonHandler';
 import Inventory from './inventory';
+import FloatingText from '../systems/floatingText';
 
 //@ts-ignore
 interface ISpriteAdd extends Phaser.GameObjects.Sprite {
@@ -235,30 +236,20 @@ export default class Actor {
         }
     }
 
-    hurt(arrIndex? : number) : void {
-        if (!this.bIsPlayer) {
-            if (this.oGameScene.oActorsMap.hasOwnProperty(this.oPosition.x + "." + this.oPosition.y)) {
-                delete this.oGameScene.oActorsMap[this.oPosition.x + "." + this.oPosition.y];
-            } else {
-                for (let key in this.oGameScene.oActorsMap) {
-                    if (this.oGameScene.oActorsMap[key].nLocalID == this.nLocalID) {
-                        delete this.oGameScene.oActorsMap[key];
-                    }
-                }
+    hurt(faDmg: number, maDmg: number) : void {
+        new FloatingText(this.oGameScene, {
+            text: "-" + (faDmg + maDmg),
+            // @ts-ignore
+            parentObject: this.oSprite,
+            textStyle: {
+                fontSize: 14,
+                fill: "#FF0000",
+                stroke: "#ffffff",
+                strokeThickness: 2,
+                wordWrap: true,
+                wordWrapWidth: 200
             }
-        };
-
-        if (arrIndex) {
-            this.oGameScene.aActorsList.splice(arrIndex, 1);
-        } else {
-            for (arrIndex = 0; arrIndex < this.oGameScene.aActorsList.length; arrIndex++) {
-                if (this.oGameScene.aActorsList[arrIndex].nLocalID == this.nLocalID) {
-                    this.oGameScene.aActorsList.splice(arrIndex, 1);
-                }
-            }
-        };
-
-        this.oSprite.destroy();
+        })
     }
 
     pickUp(item: Item): void {}
