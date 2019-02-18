@@ -67,6 +67,8 @@ export class ActorsManager {
 
         if (!actor.bIsPlayer) {
             this.oGameScene.aActorsList.push(actor);
+            actor.id = this.oGameScene.aActorsList.length - 1;
+            
             this.oGameScene.oActorsMap[pos.x + "." + pos.y] = actor;
         }
 

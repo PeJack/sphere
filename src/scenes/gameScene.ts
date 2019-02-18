@@ -15,12 +15,13 @@ import Helpers from "../helpers";
 import Inventory from "../components/inventory";
 
 interface ILayers {
-    effects   : Phaser.GameObjects.Group,
-    items     : Phaser.GameObjects.Group,
-    hud       : Phaser.GameObjects.Group,
-    actors    : Phaser.GameObjects.Group,
-    ground    : Phaser.Tilemaps.DynamicTilemapLayer,
-    decoration: Phaser.Tilemaps.DynamicTilemapLayer
+    effects     : Phaser.GameObjects.Group,
+    items       : Phaser.GameObjects.Group,
+    actors      : Phaser.GameObjects.Group,
+    hud         : Phaser.GameObjects.Group,    
+    underactors : Phaser.GameObjects.Group, 
+    ground      : Phaser.Tilemaps.DynamicTilemapLayer,
+    decoration  : Phaser.Tilemaps.DynamicTilemapLayer
 }
 
 export class GameScene extends Phaser.Scene {
@@ -74,10 +75,11 @@ export class GameScene extends Phaser.Scene {
 
         this.oMapsManager.init();
 
-        this.oLayers.effects    = this.add.group();
-        this.oLayers.items      = this.add.group();
-        this.oLayers.hud        = this.add.group();
-        this.oLayers.actors     = this.add.group();
+        this.oLayers.effects     = this.add.group();
+        this.oLayers.items       = this.add.group();
+        this.oLayers.actors      = this.add.group();
+        this.oLayers.hud         = this.add.group();
+        this.oLayers.underactors = this.add.group();        
 
         this.oEffectsManager    = new EffectsManager(this);
         
@@ -99,7 +101,7 @@ export class GameScene extends Phaser.Scene {
         }
 
         this.oPlayer = this.oActorsManager.create(0);
-        for (let i = 1; i < 10; i++) {
+        for (let i = 1; i < 100; i++) {
             this.oActorsManager.create(Helpers.random(1,2));
         }
 
@@ -110,6 +112,9 @@ export class GameScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, this.oMapsManager.nCols * this.nTileSize, this.oMapsManager.nRows * this.nTileSize);        
         this.cameras.main.startFollow(this.oPlayer.oSprite);
         this.cameras.main.roundPixels = true;
+        
+        this.oLayers.hud.setDepth(11, 0);
+        this.oPlayer.oSprite.setDepth(10);
 
         this.oMapsManager.oMap.light();
     }

@@ -135,9 +135,6 @@ export interface IItem {
     mutator_desc: string 
 }
 
-let qwe: IItem
-qwe.slot
-
 export interface IStats {
     /** сила */
     str: number,

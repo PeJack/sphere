@@ -18,7 +18,7 @@ export class Enemy extends Actor {
         
         this.nEntityID = data.id;
         this.nSpriteOffset = data.spriteOffset;
-        this.nHp = 100;
+        this.nHp = 10000;
         this.nSp = 110;
         this.nDamage = 1;
         this.bAlerted = false;
@@ -53,19 +53,19 @@ export class Enemy extends Actor {
             return;
         }
 
-        if (this.oGameScene.oActorsMap.hasOwnProperty(firstPath.x + "." + firstPath.y)) {
-            path = this.oGameScene.oMapsManager.oMap.pathFinding(this, this.oGameScene.oPlayer);
-            if (path.length > 1) path.shift();
-            this.oGameScene.time.addEvent({
-                delay: 100,
-                callback: function() {
-                    this.moveTo(path)
-                },
-                callbackScope: this
-            })
+        // if (this.oGameScene.oActorsMap.hasOwnProperty(firstPath.x + "." + firstPath.y)) {
+        //     path = this.oGameScene.oMapsManager.oMap.pathFinding(this, this.oGameScene.oPlayer);
+        //     if (path.length > 1) path.shift();
+        //     this.oGameScene.time.addEvent({
+        //         delay: 100,
+        //         callback: function() {
+        //             this.moveTo(path)
+        //         },
+        //         callbackScope: this
+        //     })
 
-            return;
-        }
+        //     return;
+        // }
 
         if (this.oGameScene.oMapsManager.oMap.computeVisibilityBetween(this, this.oGameScene.oPlayer)) {
             if (this.oAlertedTimer) { this.oAlertedTimer.destroy() };

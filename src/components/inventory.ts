@@ -396,10 +396,41 @@ export default class Inventory {
                                 closestSlot.item    = item;
 
                                 closestSlot.parent.oBackgroundContainer.remove(closestItem);
+
+                                if (closestItem.oStackText) {
+                                    closestSlot.parent.oBackgroundContainer.remove(closestItem.oStackText);
+                                    heldItemSlot.parent.oBackgroundContainer.add(closestItem.oStackText);
+                                    closestItem.oLevelText.x = (heldItemSlot.x - heldItemSlot.width / 2) + 3;
+                                    closestItem.oLevelText.y = heldItemSlot.y + 7;
+                                }
+                                
+                                if (closestItem.oLevelText) {
+                                    closestSlot.parent.oBackgroundContainer.remove(closestItem.oLevelText);
+                                    heldItemSlot.parent.oBackgroundContainer.add(closestItem.oLevelText);
+                                    closestItem.oLevelText.x = (heldItemSlot.x - heldItemSlot.width / 2) + 3;
+                                    closestItem.oLevelText.y = heldItemSlot.y + 7;                                       
+                                     
+                                }
+
                                 heldItemSlot.parent.oBackgroundContainer.add(closestItem);
 
                                 heldItemSlot.parent.oBackgroundContainer.remove(item);
-                                closestSlot.parent.oBackgroundContainer.add(item);
+
+                                if (item.oStackText) {
+                                    heldItemSlot.parent.oBackgroundContainer.remove(item.oStackText);
+                                    closestSlot.parent.oBackgroundContainer.add(item.oStackText);
+                                    item.oLevelText.x = (closestSlot.x - closestSlot.width / 2) + 3;
+                                    item.oLevelText.y = closestSlot.y + 7;                                                                      
+                                }
+
+                                if (item.oLevelText) {
+                                    heldItemSlot.parent.oBackgroundContainer.remove(item.oLevelText);
+                                    closestSlot.parent.oBackgroundContainer.add(item.oLevelText);
+                                    item.oLevelText.x = (closestSlot.x - closestSlot.width / 2) + 3;
+                                    item.oLevelText.y = closestSlot.y + 7;                                    
+                                }
+
+                                closestSlot.parent.oBackgroundContainer.add(item);                 
                             } else {
                                 item.oSlot          = closestSlot;
                                 closestSlot.item    = item;
@@ -408,6 +439,20 @@ export default class Inventory {
 
                                 heldItemSlot.parent.oBackgroundContainer.remove(item);
                                 heldItemSlot.parent.nRemainingSlots++;
+
+                                if (item.oStackText) {
+                                    heldItemSlot.parent.oBackgroundContainer.remove(item.oStackText);
+                                    closestSlot.parent.oBackgroundContainer.add(item.oStackText);
+                                    item.oLevelText.x = (closestSlot.x - closestSlot.width / 2) + 3;
+                                    item.oLevelText.y = closestSlot.y + 7;
+                                }
+
+                                if (item.oLevelText) {
+                                    heldItemSlot.parent.oBackgroundContainer.remove(item.oLevelText);
+                                    closestSlot.parent.oBackgroundContainer.add(item.oLevelText);
+                                    item.oLevelText.x = (closestSlot.x - closestSlot.width / 2) + 3;
+                                    item.oLevelText.y = closestSlot.y + 7;                                  
+                                }
 
                                 closestSlot.parent.oBackgroundContainer.add(item);
                                 closestSlot.parent.nRemainingSlots--;

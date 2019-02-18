@@ -43,6 +43,7 @@ export class BootScene extends Phaser.Scene {
 
         this.loadUI();
         this.loadItems();
+        this.loadBlood();
     }
 
     create(): void {
@@ -71,5 +72,47 @@ export class BootScene extends Phaser.Scene {
 
     private loadItems(): void {
         this.load.atlas("items_spritesheet", 'assets/sprites/items.png','assets/sprites/items.json');
+    }
+
+    private loadBlood(): void {
+        this.load.spritesheet('blood_hit_1', 'assets/sprites/blood/blood_hit_01.png', {
+            frameWidth: 128,
+            frameHeight: 128            
+        });
+
+        this.load.spritesheet('blood_hit_2', 'assets/sprites/blood/blood_hit_02.png', {
+            frameWidth: 128,
+            frameHeight: 128            
+        });
+
+        this.load.spritesheet('blood_hit_3', 'assets/sprites/blood/blood_hit_03.png', {
+            frameWidth: 128,
+            frameHeight: 128            
+        });
+
+        this.load.spritesheet('blood_hit_4', 'assets/sprites/blood/blood_hit_04.png', {
+            frameWidth: 128,
+            frameHeight: 128            
+        });
+
+        this.load.spritesheet('blood_hit_5', 'assets/sprites/blood/blood_hit_05.png', {
+            frameWidth: 128,
+            frameHeight: 128            
+        });
+
+        this.load.spritesheet('blood_hit_6', 'assets/sprites/blood/blood_hit_06.png', {
+            frameWidth: 128,
+            frameHeight: 128            
+        });
+
+        this.load.spritesheet('blood_hit_7', 'assets/sprites/blood/blood_hit_07.png', {
+            frameWidth: 128,
+            frameHeight: 128            
+        });
+
+        this.load.spritesheet('blood_hit_8', 'assets/sprites/blood/blood_hit_08.png', {
+            frameWidth: 128,
+            frameHeight: 128            
+        });
     }
 }

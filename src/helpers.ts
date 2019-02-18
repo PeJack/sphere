@@ -103,6 +103,19 @@ class Helpers {
 
         return Array(+digits.join("") + 1).join("M") + roman;
     }
+
+    nearBy(x: number, y: number, r: number): IPoint {
+        let u = Math.random();
+        let v = Math.random();
+
+        let w = r * Math.sqrt(u);
+        let t = 2 * Math.PI * v;
+
+        let x2 = (w * Math.cos(t)) / Math.cos(x);
+        let y2 = w * Math.sin(t);
+
+        return {x: x + x2, y: y + y2};
+    }
 }
 
 export default new Helpers;
