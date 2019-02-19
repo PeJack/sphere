@@ -1,4 +1,5 @@
 import { IPosition, IPath } from "../interfaces";
+import { Game } from "../game";
 
 interface IOptions {
     text: string,
@@ -36,7 +37,7 @@ interface ITextObject extends Phaser.GameObjects.Text {
 export default class FloatingText {
     private oScene                      : Phaser.Scene;
     private oContainer                  : Phaser.GameObjects.Container;
-    private oPool                       : Phaser.GameObjects.Group;
+    private oGroup                      : Phaser.GameObjects.Group;
 
     private sText                       : string;
     private oTextStyle                  : object;
@@ -63,7 +64,7 @@ export default class FloatingText {
 
     constructor(scene: Phaser.Scene, opts: IOptions) {
         this.oScene     = scene;
-        this.oContainer = this.oScene.add.container(0, 0);;
+        this.oContainer = this.oScene.add.container(0, 0);
 
         this.sText  = opts.text;
         this.oTextStyle  = opts.textStyle || {
@@ -171,22 +172,21 @@ export default class FloatingText {
 
         this.oContainer.add(textObj);
         this.oContainer.visible = false;
-
-        this.animate();
+        
+        this.animate(textObj);
     }
 
-    animate(): void {
+    animate(textObj: Phaser.GameObjects.Text): void {
         this.oContainer.visible = true;
+        this.oContainer.setDepth(100);
         if (this.sAnimation === "explode") {
-            let textObj: any = this.oContainer.getAt(this.oContainer.getAll().length - 1);
-
             this.oScene.tweens.add({
                 targets: textObj,
                 scaleX: 1.2,
                 scaleY: 1.2,
                 duration: 250,
                 delay: 0,
-                ease: Phaser.Math.Easing.Back.Out,
+                ease: this.oEasing,
                 onComplete: function() {
                     this.oScene.tweens.add({
                         targets: textObj,
@@ -202,6 +202,27 @@ export default class FloatingText {
                 onCompleteScope: this,
             })
 
+        } else if (this.sAnimation === "up") {
+            this.oScene.tweens.add({
+                targets: this.oContainer,
+                y: this.oContainer.y - this.nDistance,
+                duration: 400,
+                delay: 100,
+                ease: this.oEasing,
+                onComplete: function() {
+                    this.oScene.tweens.add({
+                        targets: textObj,
+                        alpha: 0,
+                        duration: 150,
+                        delay: this.nTimeToLive,
+                        onComplete: function() {
+                            this.oContainer.remove(textObj);
+                        },
+                        onCompleteScope: this
+                    });
+                },
+                onCompleteScope: this,
+            })
         }
     }
 }

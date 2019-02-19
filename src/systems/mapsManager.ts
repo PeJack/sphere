@@ -57,7 +57,7 @@ export class MapsManager {
         const self = this;        
         this.oMapData.create(function (x, y, v) {
             if (v === 1) {
-                // self.oGameScene.oLayers.ground.putTileAt(0, x, y);
+                self.oGameScene.oLayers.ground.putTileAt(0, x, y);
             } else {
                 self.oGameScene.oLayers.ground.putTileAt(GROUND_TILE, x, y);                    
             }

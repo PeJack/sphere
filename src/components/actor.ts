@@ -540,6 +540,7 @@ export default class Actor {
             text: "-" + (faDmg + maDmg),
             // @ts-ignore
             parentObject: this.oSprite,
+            animation: "explode",
             textStyle: {
                 fontSize: 14,
                 fill: "#FF0000",

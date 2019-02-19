@@ -182,59 +182,6 @@ class Item extends Phaser.GameObjects.Sprite {
         this.oActor.oSprite.scaleX = newScale;    
         this.oActor.oSprite.anims.play("attack_" + this.oActor.nEntityID);
         this.fEffect.call(this.oGameScene.oEffectsManager, x, y);
-    
-        // const target = this.oGameScene.getPosition({x: x, y: y});
-        // const actorPos = this.oActor.getPosition();
-
-        // if (target.x === actorPos.x && target.y === actorPos.y) {
-        //     target.y += 1;
-        // }
-
-        // let targetActor = this.oGameScene.oActorsMap[target.x + "." + target.y];
-        // if (!targetActor) {
-        //     let i = 0;
-        //     while (i < 7) {
-        //         switch (i) {
-        //             case 0:
-        //                 targetActor = this.oGameScene.oActorsMap[(target.x-1) + "." + (target.y-1)];
-        //                 break;
-        //             case 1:
-        //                 targetActor = this.oGameScene.oActorsMap[(target.x-1) + "." + (target.y)];
-        //                 break;  
-        //             case 2:
-        //                 targetActor = this.oGameScene.oActorsMap[(target.x-1) + "." + (target.y+1)];
-        //                 break;
-        //             case 3:
-        //                 targetActor = this.oGameScene.oActorsMap[(target.x) + "." + (target.y-1)];
-        //                 break;   
-        //             case 4:
-        //                 targetActor = this.oGameScene.oActorsMap[(target.x) + "." + (target.y+1)];
-        //                 break; 
-        //             case 5:
-        //                 targetActor = this.oGameScene.oActorsMap[(target.x+1) + "." + (target.y-1)];
-        //                 break;  
-        //             case 6:
-        //                 targetActor = this.oGameScene.oActorsMap[(target.x+1) + "." + (target.y)];
-        //                 break;  
-        //             case 7:
-        //                 targetActor = this.oGameScene.oActorsMap[(target.x+1) + "." + (target.y+1)];
-        //                 break;                                                                                                                                                                      
-        //         }
-
-        //         if (targetActor) {
-        //             i = 7;
-        //         } else {
-        //             i++;
-        //         }
-        //     }
-        // }
-
-        // if (targetActor) {
-        //     targetActor.hurt(
-        //         Helpers.random(this.nFaMaxDmg, this.nFaMinDmg), 
-        //         Helpers.random(this.nMaMaxDmg, this.nMaMinDmg)
-        //     );
-        // }
 
         const dummy = this.oGameScene.oLayers.actors.create(x, y, "dummy", 0, false); 
         for (let i = 0; i < this.oGameScene.aActorsList.length; i++) {
@@ -246,6 +193,16 @@ class Item extends Phaser.GameObjects.Sprite {
                 );
             }            
         }
+
+        let oPosition = this.oGameScene.getPosition({x: x, y: y});
+        if (this.oGameScene.oMapsManager.oMap.getTileInTilesArray(oPosition.x, oPosition.y)) {
+            this.oGameScene.oMapsManager.oMap.destroyTile(oPosition.x, oPosition.y, this.oGameScene.oLayers.decoration);
+        }
+        // let tile = this.oGameScene.oMapsManager.oMap.getTileAt(oPosition.x, oPosition.y, this.oGameScene.oLayers.decoration.layer);
+        // if (tile) {
+        //     this.oGameScene.oMapsManager.oMap.destroyTile(tile, this.oGameScene.oLayers.decoration);
+        // }
+
         dummy.destroy();
 
         this.bReloading = true;

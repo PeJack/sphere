@@ -142,7 +142,7 @@ export class Map {
 
         this.oFov.compute(this.oGameScene.oPlayer.oPosition.x, this.oGameScene.oPlayer.oPosition.y, 10, function (x, y, r, visibility) {
             let tile: ITile = self.getTileAt(x, y, self.oGameScene.oLayers.ground.layer); // self.oTilemap.getTileAt(x, y, false, self.oTilemap.layers[1]);
-
+            
             if (tile) {
                 tile.visible = true;
                 tile.alpha = visibility;
@@ -194,7 +194,7 @@ export class Map {
         return path;
     }
 
-    private getTileAt(x: number, y: number, layer: Tilemaps.LayerData): Phaser.Tilemaps.Tile {
+    public getTileAt(x: number, y: number, layer: Tilemaps.LayerData): Phaser.Tilemaps.Tile {
         if (this.IsInLayerBounds(x, y, layer)) {
             const tile = layer.data[y][x] || null;
 
@@ -207,7 +207,25 @@ export class Map {
         }
     }
 
+    public getTileInTilesArray(x: number, y: number): boolean {
+        if (this.oTiles[x] && this.oTiles[x][y]) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private IsInLayerBounds(x: number, y: number, layer: Tilemaps.LayerData): boolean {
         return (x >= 0 && x < layer.width && y >= 0 && y < layer.height);
-    };
+    }
+
+    public destroyTile(x: number, y: number, tilemap: Tilemaps.DynamicTilemapLayer) {
+        this.oTiles[x][y] = 0;
+        tilemap.removeTileAt(x, y);
+        if (this.oRotmap._map[x] && this.oRotmap._map[x][y]) {
+            this.oRotmap._map[x][y] = 0;
+        }
+
+        this.light();
+    }
 }
