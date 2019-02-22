@@ -101,7 +101,7 @@ export class GameScene extends Phaser.Scene {
         }
 
         this.oPlayer = this.oActorsManager.create(0);
-        for (let i = 1; i < 10; i++) {
+        for (let i = 1; i < 50; i++) {
             this.oActorsManager.create(Helpers.random(1,2));
         }
 
@@ -159,5 +159,9 @@ export class GameScene extends Phaser.Scene {
         let boundsB = objB.getBounds();
         
         return !Phaser.Geom.Rectangle.Intersection(boundsA, boundsB).isEmpty();
+    }
+
+    distanceBetween(pos1: IPosition|IPath, pos2: IPosition|IPath): number {
+        return Phaser.Math.Distance.Between(pos1.x, pos1.y, pos2.x, pos2.y);
     }
 }

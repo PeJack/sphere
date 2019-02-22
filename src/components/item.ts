@@ -184,24 +184,20 @@ class Item extends Phaser.GameObjects.Sprite {
         this.fEffect.call(this.oGameScene.oEffectsManager, x, y);
 
         const dummy = this.oGameScene.oLayers.actors.create(x, y, "dummy", 0, false); 
-        for (let i = 0; i < this.oGameScene.aActorsList.length; i++) {
-            let actor = this.oGameScene.aActorsList[i];
-            if (this.oGameScene.checkOverlap(dummy, actor.oSprite)) {
-                actor.hurt(
-                    Helpers.random(this.nFaMaxDmg, this.nFaMinDmg), 
-                    Helpers.random(this.nMaMaxDmg, this.nMaMinDmg)
-                );
-            }            
-        }
-
         let oPosition = this.oGameScene.getPosition({x: x, y: y});
         if (this.oGameScene.oMapsManager.oMap.getTileInTilesArray(oPosition.x, oPosition.y)) {
             this.oGameScene.oMapsManager.oMap.destroyTile(oPosition.x, oPosition.y, this.oGameScene.oLayers.decoration);
+        } else {
+            for (let i = 0; i < this.oGameScene.aActorsList.length; i++) {
+                let actor = this.oGameScene.aActorsList[i];
+                if (this.oGameScene.checkOverlap(dummy, actor.oSprite)) {
+                    actor.hurt(
+                        Helpers.random(this.nFaMaxDmg, this.nFaMinDmg), 
+                        Helpers.random(this.nMaMaxDmg, this.nMaMinDmg)
+                    );
+                }            
+            }
         }
-        // let tile = this.oGameScene.oMapsManager.oMap.getTileAt(oPosition.x, oPosition.y, this.oGameScene.oLayers.decoration.layer);
-        // if (tile) {
-        //     this.oGameScene.oMapsManager.oMap.destroyTile(tile, this.oGameScene.oLayers.decoration);
-        // }
 
         dummy.destroy();
 
@@ -291,7 +287,6 @@ class Item extends Phaser.GameObjects.Sprite {
         projectile.angle = angle + 180;   
       
         this.bReloading = true;
-        this.oVisualTimer.oSprite.visible = true;
         this.oVisualTimer.start();
         this.createProjectile(coordPath, projectile);
     }   
@@ -300,17 +295,7 @@ class Item extends Phaser.GameObjects.Sprite {
         const firstPath: IPoint = path.shift(),
             projectilePos: IPosition = this.oGameScene.getPosition(projectile),
             firstPathPos: IPosition = this.oGameScene.getPosition(firstPath),
-            delay: number = 25 * (Math.abs(projectilePos.x - firstPathPos.x) + Math.abs(projectilePos.y - firstPathPos.y));   
-
-        // const targetActor: Actor = this.oGameScene.oActorsMap[projectilePos.x + "." + projectilePos.y];
-        // if (targetActor) {
-        //     targetActor.hurt(
-        //         Helpers.random(this.nFaMaxDmg, this.nFaMinDmg), 
-        //         Helpers.random(this.nMaMaxDmg, this.nMaMinDmg)
-        //     );
-        //     projectile.destroy();
-        //     return;
-        // }
+            delay: number = 25 * (Math.abs(projectilePos.x - firstPathPos.x) + Math.abs(projectilePos.y - firstPathPos.y));
 
         for (let i = 0; i < this.oGameScene.aActorsList.length; i++) {
             let actor = this.oGameScene.aActorsList[i];

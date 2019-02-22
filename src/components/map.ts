@@ -77,7 +77,7 @@ export class Map {
 
                 this.oGameScene.aActorsList.forEach(actor => {
                     if (actor.oPosition.x == tile.x && actor.oPosition.y == tile.y) {
-                        // actor.oSprite.alpha = 0;
+                        actor.oSprite.alpha = 0;
                         actor.bVisibleForPlayer = false;
                     }
                 });
@@ -120,7 +120,7 @@ export class Map {
 
                     this.oGameScene.aActorsList.forEach(actor => {
                         if (actor.oPosition.x == x && actor.oPosition.y == y) {
-                            // actor.oSprite.alpha = 0;
+                            actor.oSprite.alpha = 0;
                             actor.bVisibleForPlayer = false;
                         }
                     });
@@ -160,7 +160,7 @@ export class Map {
 
             self.oGameScene.aActorsList.forEach(function(actor) {
                 if (actor.oPosition.x == x && actor.oPosition.y == y) {
-                    // actor.oSprite.alpha = visibility;
+                    actor.oSprite.alpha = visibility;
                     actor.bVisibleForPlayer = true;
                 }
             });

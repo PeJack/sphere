@@ -9,7 +9,6 @@ export class Player extends Actor {
     public nSpriteOffset    : number;
     public nHp              : number;
     public nSp              : number;
-    public nDamage          : number;
     public nMovingDelay     : number;
     public oButtonHandler   : ButtonHandler;
     public oDownButtons     : IDownButtons;
@@ -21,9 +20,9 @@ export class Player extends Actor {
 
         this.nEntityID      = 0;
         this.nSpriteOffset  = data.spriteOffset;
-        this.nHp            = 100;
+        this.nMaxHp         = 1000;
+        this.nHp            = this.nMaxHp;
         this.nSp            = 110;
-        this.nDamage        = 1;
         this.nMovingDelay   = 100;
 
         this.oButtonHandler = this.oGameScene.oButtonHandler;

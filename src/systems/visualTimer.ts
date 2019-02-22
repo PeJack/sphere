@@ -12,6 +12,7 @@ export default class VisualTimer {
     public oBackground    : Phaser.GameObjects.Sprite;
     public oSprite        : Phaser.GameObjects.Sprite;
     public bHasFinished   : boolean;
+    
 
 
     constructor(opts) {
@@ -27,7 +28,7 @@ export default class VisualTimer {
         let key = 'timer';
         if (opts.key) {
             key = opts.key;
-        }   
+        }
 
         this.oBackground = this.oGameScene.add.sprite(0, 0, key + "_bg", 0);
         this.oBackground.setOrigin(0, 3.5);

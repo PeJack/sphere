@@ -35,15 +35,25 @@ export default class Actor {
     public aPath                : IPath[];
     public oWeapon              : Item;
     public nHp                  : number;
+    public nMaxHp               : number;
     public nSp                  : number;
-    public nDamage              : number;
+    public nRange               : number;
+    public nFaMaxDmg            : number;
+    public nFaMinDmg            : number;
+    public nMaMaxDmg            : number;
+    public nMaMinDmg            : number;
+    public nReloadTime          : number;
+    public bReloading           : boolean;
     public oButtonHandler       : ButtonHandler;
     public oDownButtons         : IDownButtons;
     public oInventory           : Inventory;
+    public oHealthBarBg         : Phaser.GameObjects.Graphics;
+    public oHealthBar           : Phaser.GameObjects.Graphics;
+    public oContainer           : Phaser.GameObjects.Container;  
 
     private bWalking            : boolean;
     private sCurrDir            : string; 
-    private oGroup              : Phaser.GameObjects.Group;       
+    private oGroup              : Phaser.GameObjects.Group;
 
     constructor(gameScene: GameScene, pos: IPosition) {
         this.oGameScene = gameScene;
@@ -80,6 +90,10 @@ export default class Actor {
             left: this.nScale,
             right: -this.nScale
         };
+
+        this.oContainer = this.oGameScene.add.container(this.oSprite.x, this.oSprite.y);
+        
+        this.createHealthBar();
     }
 
     setAnimations(): void {
@@ -492,7 +506,11 @@ export default class Actor {
             onComplete: function() {
                 this.stopWalk(callback, context);
             },
-            onCompleteScope: this
+            onCompleteScope: this,
+            onUpdate: function() {
+                this.oContainer.setPosition(this.oSprite.x, this.oSprite.y);
+            },
+            onUpdateScope: this
         });
     }
 
@@ -553,6 +571,14 @@ export default class Actor {
 
         this.nHp -= faDmg + maDmg;
 
+        this.oHealthBar.clear();
+        this.oHealthBar.fillStyle(0x88e453, 1);
+        this.oHealthBar.fillRect(
+            - (this.oSprite.width / 4), 
+            - this.oSprite.height / 2,
+            (this.oSprite.width / 2) * (this.nHp / this.nMaxHp), 2
+        ); 
+
         const dummyPos = {} as IPoint;
         let frames = [1,2,3,4,5];
         let frame = frames[Math.floor(Math.random()*frames.length)];
@@ -594,7 +620,29 @@ export default class Actor {
 
     kill(): void {
         this.oGroup.remove(this.oSprite, true);
+        this.oContainer.removeAll(true);
         this.oGameScene.aActorsList = this.oGameScene.aActorsList.filter(actor=> actor.id !== this.id);
+    }
+
+    private createHealthBar(): void {
+        this.oHealthBarBg = this.oGameScene.add.graphics();
+        this.oHealthBarBg.lineStyle(1, 0x000000)
+        this.oHealthBarBg.strokeRect(
+            - this.oSprite.width / 4, 
+            - this.oSprite.height / 2, 
+            (this.oSprite.width / 2) - 1, 2
+        ); 
+        this.oContainer.add(this.oHealthBarBg);
+
+        this.oHealthBar = this.oGameScene.add.graphics();
+        this.oHealthBar.fillStyle(0x88e453, 1);
+        this.oHealthBar.fillRect(
+            - this.oSprite.width / 4, 
+            - this.oSprite.height / 2, 
+            (this.oSprite.width / 2) - 1, 2
+        ); 
+
+        this.oContainer.add(this.oHealthBar);
     }
 
     pickUp(item: Item): void {}
